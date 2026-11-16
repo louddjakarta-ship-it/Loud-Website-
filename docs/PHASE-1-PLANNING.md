@@ -124,7 +124,7 @@ loud-jakarta/
 │   │   └── format.ts      # tanggal Asia/Jakarta, slug, dll.
 │   ├── actions/           # server actions admin
 │   ├── types/
-│   ├── middleware.ts
+│   ├── proxy.ts
 │   └── styles/globals.css
 ├── supabase/
 │   ├── migrations/
@@ -541,7 +541,7 @@ Semua divalidasi ulang di server dengan Zod; validasi client hanya untuk UX.
 
 ### 6.6 Security headers
 
-Diterapkan via `next.config.ts` + middleware (CSP nonce):
+Diterapkan via `next.config.ts` + proxy (CSP nonce):
 - `Content-Security-Policy` (default-src 'self'; img-src self + Supabase + data/blob;
   connect-src self + Supabase; frame-ancestors 'none'; form-action 'self')
 - `X-Content-Type-Options: nosniff`
@@ -552,7 +552,7 @@ Diterapkan via `next.config.ts` + middleware (CSP nonce):
 
 ### 6.7 Proteksi route admin
 
-1. `middleware.ts` me-refresh sesi Supabase dan redirect ke `/admin/login` bila
+1. `proxy.ts` me-refresh sesi Supabase dan redirect ke `/admin/login` bila
    tidak ada sesi untuk path `/admin/*` (kecuali `/admin/login`).
 2. `src/app/admin/layout.tsx` memanggil `requireAdmin()` → query
    `admin_profiles` dengan server client; jika tidak ada/`is_active=false` →
@@ -694,16 +694,16 @@ kamera/galeri di mobile), `ImagePreview`, `PrivacyNotice`, `SuccessPanel`,
 Deliverable:
 - Project Next.js + TypeScript + Tailwind berjalan lokal.
 - Struktur folder sesuai §2.4 (tanpa folder kosong).
-- Supabase client browser/server/admin + `middleware.ts`.
+- Supabase client browser/server/admin + `proxy.ts`.
 - `.env.example`, `README.md` awal, `docs/` awal.
 - Halaman sementara `/` yang membuktikan font & token berjalan.
 
 File utama: `package.json`, `next.config.ts`, `tsconfig.json`,
 `src/app/layout.tsx`, `src/app/page.tsx`, `src/styles/globals.css`,
-`src/lib/supabase/*`, `src/middleware.ts`, `.env.example`.
+`src/lib/supabase/*`, `src/proxy.ts`, `.env.example`.
 
-Prasyarat lingkungan (dicek): **Node.js belum terpasang** di mesin ini.
-Perlu install Node.js LTS (≥ 20) sebelum PHASE 2. Git sudah tersedia (2.56.1).
+Prasyarat lingkungan: **Node.js 24.20.0** terpasang (winget, user scope),
+npm 11.19.0, Git 2.56.1. Lihat `docs/PHASE-2-SETUP.md` untuk hasil verifikasi.
 
 Checkpoint: `npm run dev` + `npm run build` sukses, halaman sementara tampil.
 
@@ -820,5 +820,5 @@ dibuktikan, bukan diklaim.
 | Duplikat guestlist | **Blokir total per event** (1 Instagram = 1 pendaftaran, termasuk setelah rejected) |
 | Rencana PHASE 1 | **Disetujui** → lanjut PHASE 2 |
 
-Prasyarat PHASE 2: **Node.js LTS** perlu terpasang (belum ada di mesin ini;
-Git 2.56.1 sudah tersedia).
+Prasyarat PHASE 2: **terpenuhi** — Node.js 24.20.0, npm 11.19.0, Git 2.56.1.
+Hasil verifikasi ada di `docs/PHASE-2-SETUP.md`.
