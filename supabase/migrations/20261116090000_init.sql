@@ -255,17 +255,43 @@ before update on public.guestlist
 for each row execute function public.set_guestlist_review_audit();
 
 -- ----------------------------------------------------------------------------
--- Grants: keep anon away from private data, and restrict guestlist updates to
--- review-related columns even for authenticated admins.
+-- Grants
+-- Explicit grants so access does not depend on project Data API defaults.
+-- RLS still decides which rows are visible.
 -- ----------------------------------------------------------------------------
+revoke all on public.events from anon;
+revoke all on public.events from authenticated;
 revoke all on public.admin_profiles from anon;
+revoke all on public.admin_profiles from authenticated;
 revoke all on public.guestlist from anon;
+revoke all on public.guestlist from authenticated;
 revoke all on public.submission_attempts from anon;
 revoke all on public.submission_attempts from authenticated;
 
-revoke update on public.guestlist from authenticated;
+grant select on public.events to anon;
+grant select, insert, update, delete on public.events to authenticated;
+
+grant select, update on public.admin_profiles to authenticated;
+
+grant select, delete on public.guestlist to authenticated;
 grant update (status, admin_note, reviewed_by, reviewed_at)
   on public.guestlist to authenticated;
+
+-- Supabase stopped granting new tables to service_role automatically in 2026.
+-- The server-side admin client needs explicit table and sequence privileges.
+grant usage on schema public to anon, authenticated, service_role;
+grant all on public.admin_profiles to service_role;
+grant all on public.events to service_role;
+grant all on public.guestlist to service_role;
+grant all on public.submission_attempts to service_role;
+grant usage, select on sequence public.submission_attempts_id_seq to service_role;
+
+-- SECURITY DEFINER helpers are callable by PUBLIC by default. Limit execution
+-- to signed-in admins (RLS policies still gate the rows).
+revoke execute on function public.is_admin() from public;
+revoke execute on function public.is_super_admin() from public;
+grant execute on function public.is_admin() to authenticated;
+grant execute on function public.is_super_admin() to authenticated;
 
 -- ----------------------------------------------------------------------------
 -- Row Level Security
