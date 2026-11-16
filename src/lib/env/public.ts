@@ -12,6 +12,7 @@ export const publicEnv = {
   siteUrl: process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",
   defaultWhatsappNumber:
     process.env.NEXT_PUBLIC_DEFAULT_WHATSAPP_NUMBER ?? "",
+  instagramUrl: process.env.NEXT_PUBLIC_INSTAGRAM_URL ?? "",
   turnstileSiteKey: process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY ?? "",
 } as const;
 

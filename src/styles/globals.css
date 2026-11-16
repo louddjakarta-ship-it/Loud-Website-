@@ -41,6 +41,29 @@
   --ease-out-expo: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
+@utility shell {
+  margin-inline: auto;
+  width: 100%;
+  max-width: 1440px;
+  padding-inline: clamp(20px, 5vw, 72px);
+}
+
+@layer components {
+  .hero-glow {
+    background:
+      radial-gradient(
+        55% 55% at 18% 22%,
+        rgb(198 255 0 / 0.1),
+        transparent 72%
+      ),
+      radial-gradient(
+        45% 55% at 92% 8%,
+        rgb(198 255 0 / 0.06),
+        transparent 72%
+      );
+  }
+}
+
 @layer base {
   html {
     background-color: var(--color-ink);

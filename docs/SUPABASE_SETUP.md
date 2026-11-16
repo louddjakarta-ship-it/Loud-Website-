@@ -45,6 +45,7 @@ Opsional:
 
 ```env
 NEXT_PUBLIC_DEFAULT_WHATSAPP_NUMBER=628xxxxxxxxxx
+NEXT_PUBLIC_INSTAGRAM_URL=https://instagram.com/xxxxxxxx
 NEXT_PUBLIC_SITE_URL=http://localhost:3000
 ```
 
@@ -64,15 +65,25 @@ Karena admin dibuat manual (tidak ada self-signup):
 
 **Cara A — SQL Editor (paling cepat)**
 
-1. Buka **SQL Editor** → **New query**.
-2. Copy seluruh isi `supabase/migrations/20261116090000_init.sql`.
-3. Klik **Run**.
-4. Pastikan tidak ada error. Migration ini membuat:
-   - enum, tabel `admin_profiles`, `events`, `guestlist`, `submission_attempts`
-   - constraint, index, trigger `updated_at`
-   - RLS policies + helper `is_admin()` / `is_super_admin()`
-   - bucket `event-flyers` (public) dan `guestlist-proofs` (private)
-   - storage policies
+Jalankan migration sesuai urutan:
+
+1. `supabase/migrations/20261116090000_init.sql`
+2. `supabase/migrations/20261116050000_harden_functions.sql`
+3. `supabase/migrations/20261116100000_submission_attempt_kind.sql`
+
+Untuk setiap file: **SQL Editor → New query → paste → Run**. Pastikan tidak ada
+error sebelum lanjut ke file berikutnya.
+
+Migration ini membuat:
+
+- enum, tabel `admin_profiles`, `events`, `guestlist`, `submission_attempts`
+- constraint, index, trigger `updated_at`
+- RLS policies
+- helper `private.is_admin()` / `private.is_super_admin()` (schema `private`
+  tidak diekspos melalui Data API)
+- bucket `event-flyers` (public) dan `guestlist-proofs` (private)
+- storage policies
+- kolom `submission_attempts.kind` + index rate limit
 
 **Cara B — Supabase CLI**
 
@@ -85,6 +96,27 @@ npx supabase db push
 
 Jalankan `supabase/seed.sql` di SQL Editor. Ini hanya membuat **satu event
 placeholder yang belum dipublikasikan**, sehingga tidak akan muncul di homepage.
+
+Untuk smoke test lokal, event tersebut bisa dipublikasikan sementara:
+
+```sql
+update public.events
+set is_published = true
+where slug = 'placeholder-loud-jakarta-001';
+```
+
+Setelah selesai, kembalikan ke `false`. Jangan deploy dengan event placeholder
+dalam keadaan published.
+
+### Cleanup bukti orphan
+
+```bash
+npm run cleanup:orphans -- --dry-run
+npm run cleanup:orphans
+```
+
+Script menghapus file di `guestlist-proofs` yang tidak direferensikan oleh baris
+`guestlist` dan berumur lebih dari 24 jam. Butuh `SUPABASE_SECRET_KEY` asli.
 
 ## 6. Verifikasi
 
@@ -102,9 +134,11 @@ select id, public, file_size_limit, allowed_mime_types
 from storage.buckets
 where id in ('event-flyers', 'guestlist-proofs');
 
--- Helper harus ada
-select proname from pg_proc
-where proname in ('is_admin', 'is_super_admin');
+-- Helper harus ada di schema private (bukan public)
+select n.nspname, p.proname
+from pg_proc p
+join pg_namespace n on n.oid = p.pronamespace
+where p.proname in ('is_admin', 'is_super_admin');
 ```
 
 Hasil yang diharapkan:
@@ -114,7 +148,7 @@ Hasil yang diharapkan:
 | `admin_profiles`, `events`, `guestlist`, `submission_attempts` | `rowsecurity = true` |
 | `event-flyers` | `public = true` |
 | `guestlist-proofs` | `public = false` |
-| `is_admin`, `is_super_admin` | ada 2 baris |
+| `private.is_admin`, `private.is_super_admin` | ada 2 baris, schema `private` |
 
 ## 7. Admin pertama (dibutuhkan di PHASE 4)
 
@@ -150,6 +184,8 @@ npm run dev
 | `/admin` mengembalikan 503 | Env admin belum lengkap | Cek `SUPABASE_SECRET_KEY` dan URL |
 | Bucket tidak ditemukan | Migration belum dijalankan | Jalankan ulang migration bagian storage |
 | `permission denied for table guestlist` | Grant sengaja dibatasi | Insert publik harus lewat route handler (service role), bukan client |
+| `/api/guestlist` mengembalikan 503 | `SUPABASE_SECRET_KEY` masih placeholder / salah | Isi secret asli, restart dev server |
+| Upload bukti gagal 503 | Bucket atau secret belum siap | Cek bucket `guestlist-proofs` dan secret key |
 
 ## Catatan keamanan
 

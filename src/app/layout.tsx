@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Anton, Inter } from "next/font/google";
+import type { ReactNode } from "react";
 
 import { publicEnv } from "@/lib/env/public";
 
@@ -52,7 +53,7 @@ export const viewport: Viewport = {
   colorScheme: "dark",
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html
       lang="en"

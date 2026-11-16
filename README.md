@@ -3,8 +3,10 @@
 Website event organizer LOUD JAKARTA: upcoming events, RSVP WhatsApp, guestlist
 dengan bukti Instagram, dan admin dashboard untuk verifikasi.
 
-Status: **PHASE 2 — Project setup selesai (fondasi)**. Halaman publik dan admin
-belum diimplementasikan; lihat `docs/PHASE-1-PLANNING.md` untuk rencana lengkap.
+Status: **PHASE 3 — Public website selesai di lokal**. Homepage, RSVP WhatsApp,
+guestlist form + dua upload bukti, privacy notice, 404, sitemap/robots sudah
+terhubung ke Supabase. Admin dashboard menyusul di PHASE 4. Lihat
+`docs/PHASE-3-PUBLIC.md` untuk hasil verifikasi dan sisa pekerjaan.
 
 ## Stack
 
@@ -55,6 +57,7 @@ Buka http://localhost:3000.
 | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Public | Ya | Publishable key (`sb_publishable_...`) |
 | `NEXT_PUBLIC_SITE_URL` | Public | Tidak | Default `http://localhost:3000` |
 | `NEXT_PUBLIC_DEFAULT_WHATSAPP_NUMBER` | Public | Tidak | Fallback nomor RSVP, digit saja |
+| `NEXT_PUBLIC_INSTAGRAM_URL` | Public | Tidak | URL profil Instagram resmi |
 | `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | Public | Tidak | Cloudflare Turnstile (opsional) |
 | `SUPABASE_SECRET_KEY` | **Server-only** | Ya | Secret key (`sb_secret_...`), bypass RLS |
 | `RATE_LIMIT_SALT` | **Server-only** | Ya | Salt hash IP untuk rate limit |
@@ -74,24 +77,46 @@ tidak boleh di-import dari Client Component. Semua akses secret melewati
 | `npm run start` | Jalankan hasil build |
 | `npm run lint` | ESLint |
 | `npm run typecheck` | TypeScript tanpa emit |
+| `npm run cleanup:orphans -- --dry-run` | Lihat file bukti orphan (>24 jam) |
+| `npm run cleanup:orphans` | Hapus file bukti orphan |
 
 ## Struktur singkat
 
 ```text
 src/
-├── app/                 # routes (App Router)
-├── components/          # public, admin, ui
+├── app/
+│   ├── (site)/          # homepage, guestlist, privacy (public layout)
+│   ├── api/guestlist/   # signed upload URL + final submission
+│   ├── not-found.tsx
+│   ├── robots.ts
+│   └── sitemap.ts
+├── components/
+│   ├── public/          # header, hero, event card, form, footer
+│   └── ui/              # button, field primitives
 ├── lib/
+│   ├── data/            # public event queries
 │   ├── env/             # validasi env public vs server-only
+│   ├── images/          # kompresi bukti di browser
+│   ├── storage/         # path, signed upload, magic bytes
 │   ├── supabase/        # browser, server, admin, proxy clients
-│   └── cn.ts
+│   ├── validation/      # Zod schema guestlist
+│   ├── api.ts
+│   ├── format.ts
+│   ├── rate-limit.ts
+│   ├── turnstile.ts
+│   └── whatsapp.ts
 ├── styles/globals.css   # Tailwind + design tokens
 └── proxy.ts             # Next.js 16 Proxy (pengganti middleware)
 supabase/
-├── migrations/          # (PHASE 3)
-└── seed.sql             # (PHASE 3)
+├── migrations/          # schema + hardening + rate-limit kind
+└── seed.sql             # satu event placeholder (unpublished)
+scripts/
+└── cleanup-orphans.mjs  # hapus bukti yang tidak direferensikan
 docs/
-└── PHASE-1-PLANNING.md
+├── PHASE-1-PLANNING.md
+├── PHASE-2-SETUP.md
+├── PHASE-3-PUBLIC.md
+└── SUPABASE_SETUP.md
 ```
 
 ## Keputusan teknis PHASE 2
@@ -110,12 +135,19 @@ docs/
 
 - `SUPABASE_SECRET_KEY` hanya dipakai di `src/lib/supabase/admin.ts`
   (`import "server-only"`).
-- RLS dan Storage policies belum dibuat (PHASE 3).
+- RLS aktif di semua tabel; bucket `guestlist-proofs` private. Publik hanya
+  bisa submit lewat route handler yang memvalidasi field, file, duplikat, dan
+  rate limit.
+- Bukti diverifikasi ulang lewat magic bytes setelah upload; path dibuat server.
 - Security headers dasar sudah aktif di `next.config.ts`; CSP nonce menyusul
   di PHASE 5.
-- Jangan commit `.env.local`.
+- Jangan commit `.env.local` dan jangan pernah menaruh secret di
+  `NEXT_PUBLIC_*`.
 
 ## Dokumentasi
 
 - `LOUD_JAKARTA_Master_Prompt.md` — brief utama
 - `docs/PHASE-1-PLANNING.md` — sitemap, flow, schema, keamanan, design system
+- `docs/PHASE-2-SETUP.md` — setup Next.js, Tailwind, Supabase client
+- `docs/PHASE-3-PUBLIC.md` — hasil public website + verifikasi
+- `docs/SUPABASE_SETUP.md` — kredensial, migration, admin pertama
