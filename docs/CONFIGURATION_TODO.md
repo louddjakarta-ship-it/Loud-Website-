@@ -12,7 +12,7 @@ Terakhir diperbarui: 18 November 2026.
 | # | Item | Status | Pemilik |
 |---|------|--------|---------|
 | 1 | Domain final | **Belum ada** | Owner |
-| 2 | Repo GitHub + remote | **Belum ada** | Owner |
+| 2 | Repo GitHub + remote | **Selesai** — `louddjakarta-ship-it/Loud-Website-`, branch `main` | Owner/dev |
 | 3 | Project Vercel + deploy production | **Belum ada** | Owner |
 | 4 | Logo resmi | Placeholder (wordmark teks) | Owner/desain |
 | 5 | Nomor WhatsApp RSVP | Perlu konfirmasi | Owner |
@@ -43,11 +43,13 @@ Terakhir diperbarui: 18 November 2026.
 
 ### 2. Repo GitHub
 
-- **Sekarang:** repo lokal, tanpa remote.
-- **Langkah:** buat repo kosong, `git remote add origin ...`,
-  `git push -u origin main`, pasang branch protection minimal.
+- **Status:** selesai. Remote `origin` →
+  `https://github.com/louddjakarta-ship-it/Loud-Website-`, branch `main`
+  sudah di-push dan tracking `origin/main`.
+- **Sisa:** pasang branch protection minimal (butuh akses GitHub owner), lalu
+  tambahkan CI bila diinginkan (`docs/DEPLOYMENT.md` §9).
 - **Jangan:** commit `.env.local`, secret key, token guestlist asli.
-- **Verifikasi:** `git remote -v` menunjuk repo yang benar; CI (jika ada) hijau.
+- **Verifikasi:** `git remote -v` dan `git ls-remote --heads origin`.
 
 ### 3. Vercel
 
@@ -197,3 +199,4 @@ Isi lewat admin dashboard:
 | Tanggal | Perubahan | Oleh |
 |---------|-----------|------|
 | 18 Nov 2026 | Dokumen dibuat; status awal sebelum deploy | Dev |
+| 18 Nov 2026 | Repo GitHub `louddjakarta-ship-it/Loud-Website-` dibuat, branch `main` di-push | Dev |

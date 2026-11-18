@@ -7,9 +7,10 @@ Status: **PHASE 5 — Security & QA selesai; PHASE 6 — Deployment siap
 dijalankan.** Public website (homepage, RSVP WhatsApp, gallery) dan admin
 dashboard (login, event management, gallery, homepage copy, guestlist link,
 review guestlist, CSV export) sudah terhubung ke Supabase. Deployment ke Vercel
-belum dilakukan karena menunggu repo GitHub dan domain final dari owner;
-panduan lengkapnya sudah tersedia di `docs/DEPLOYMENT.md` dan
-`docs/CUSTOM_DOMAIN.md`.
+belum dilakukan karena menunggu project Vercel dan domain final dari owner;
+repo GitHub sudah aktif di
+`https://github.com/louddjakarta-ship-it/Loud-Website-` dan panduan lengkapnya
+sudah tersedia di `docs/DEPLOYMENT.md` dan `docs/CUSTOM_DOMAIN.md`.
 Guestlist bersifat **link-only**: pengunjung hanya melihat upcoming events,
 sedangkan form guestlist hanya terbuka lewat `/guestlist/<token>` yang
 di-copy admin dari `/admin/events`.
