@@ -30,6 +30,29 @@ export function formatEventDateTime(value: string | Date): string {
   return `${formatEventDate(value)} · ${formatEventTime(value)}`;
 }
 
+const JAKARTA_OFFSET_MS = 7 * 60 * 60 * 1000;
+
+/** `YYYY-MM-DDTHH:mm` in Asia/Jakarta, for `<input type="datetime-local">`. */
+export function toJakartaDateTimeLocal(value: string | Date): string {
+  return new Date(new Date(value).getTime() + JAKARTA_OFFSET_MS)
+    .toISOString()
+    .slice(0, 16);
+}
+
+/**
+ * Converts a `datetime-local` value interpreted as Asia/Jakarta (UTC+7, no
+ * DST) to an ISO timestamp. Returns null for malformed values.
+ */
+export function jakartaDateTimeLocalToIso(value: string): string | null {
+  if (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(value)) {
+    return null;
+  }
+
+  const date = new Date(`${value}:00+07:00`);
+
+  return Number.isNaN(date.getTime()) ? null : date.toISOString();
+}
+
 /** Lowercase, ASCII-only slug used for event URLs. */
 export function slugify(value: string): string {
   const slug = value

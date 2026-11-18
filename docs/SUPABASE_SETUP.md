@@ -54,7 +54,7 @@ NEXT_PUBLIC_SITE_URL=http://localhost:3000
 Karena admin dibuat manual (tidak ada self-signup):
 
 1. **Authentication → Providers → Email**
-   - Pastikan Email provider **enabled** (untuk login admin).
+   - Pastikan Email provider **loudd.jkt@gmail.com** (untuk login admin).
    - Matikan **Allow new users to sign up**.
 2. **Authentication → Settings**
    - Biarkan email confirmation sesuai kebutuhan. Saat membuat admin manual
@@ -70,6 +70,11 @@ Jalankan migration sesuai urutan:
 1. `supabase/migrations/20261116090000_init.sql`
 2. `supabase/migrations/20261116050000_harden_functions.sql`
 3. `supabase/migrations/20261116100000_submission_attempt_kind.sql`
+4. `supabase/migrations/20261117093000_guestlist_share_token.sql`
+5. `supabase/migrations/20261117094500_guestlist_link_lookup.sql`
+6. `supabase/migrations/20261117110000_event_maps_url.sql`
+7. `supabase/migrations/20261117113000_site_settings.sql`
+8. `supabase/migrations/20261117115000_gallery_photos.sql`
 
 Untuk setiap file: **SQL Editor → New query → paste → Run**. Pastikan tidak ada
 error sebelum lanjut ke file berikutnya.
@@ -84,6 +89,16 @@ Migration ini membuat:
 - bucket `event-flyers` (public) dan `guestlist-proofs` (private)
 - storage policies
 - kolom `submission_attempts.kind` + index rate limit
+- kolom `events.guestlist_token` (link guestlist privat) + RPC
+  `get_guestlist_event_link` untuk resolusi token tanpa membuka kolomnya ke
+  `anon`
+- kolom `events.maps_url` + check constraint yang hanya menerima link HTTPS
+  Google Maps
+- tabel singleton `site_settings` untuk tagline + description hero yang bisa
+  diedit dari dashboard (publik hanya bisa membaca)
+- tabel `gallery_photos` + bucket publik `gallery-photos` (5 MB,
+  jpeg/png/webp) untuk gallery homepage; hanya admin yang bisa insert/delete
+  foto maupun object Storage
 
 **Cara B — Supabase CLI**
 
@@ -150,7 +165,10 @@ Hasil yang diharapkan:
 | `guestlist-proofs` | `public = false` |
 | `private.is_admin`, `private.is_super_admin` | ada 2 baris, schema `private` |
 
-## 7. Admin pertama (dibutuhkan di PHASE 4)
+## 7. Admin pertama
+
+Database tidak menyimpan admin default. Buat akun asli sebelum membuka
+`/admin/login`.
 
 1. **Authentication → Users → Add user**
    - Email admin asli.
@@ -164,7 +182,12 @@ insert into public.admin_profiles (id, display_name, role)
 values ('<uuid-user>', 'Owner', 'super_admin');
 ```
 
-4. Login akan diuji di `/admin/login` pada PHASE 4.
+4. Login di `/admin/login`. Akun tanpa baris `admin_profiles` aktif akan
+   langsung di-sign out dengan pesan generik.
+
+Untuk menambah staff operasional, ulangi langkah yang sama dengan
+`role = 'staff'`. Staff bisa mengelola event dan mereview guestlist, tetapi
+tidak bisa arsip/hapus event, hapus pendaftar, atau export CSV.
 
 ## 8. Setelah mengubah `.env.local`
 

@@ -33,10 +33,10 @@ export async function POST(request: Request) {
     );
   }
 
-  const { eventId, mimeType } = parsed.data;
+  const { eventId, guestlistToken, mimeType } = parsed.data;
 
   try {
-    const event = await getEventForSubmission(eventId);
+    const event = await getEventForSubmission(eventId, guestlistToken);
 
     if (!event) {
       return jsonError(

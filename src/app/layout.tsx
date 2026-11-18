@@ -26,7 +26,7 @@ export const metadata: Metadata = {
     template: "%s — LOUD JAKARTA",
   },
   description:
-    "Underground nightlife, electronic music and contemporary culture in Jakarta. Upcoming events, WhatsApp RSVP and guestlist registration.",
+    "Underground nightlife, electronic music and contemporary culture in Jakarta. Upcoming events and RSVP via WhatsApp.",
   applicationName: "LOUD JAKARTA",
   openGraph: {
     type: "website",

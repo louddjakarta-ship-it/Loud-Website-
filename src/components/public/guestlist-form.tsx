@@ -11,7 +11,6 @@ import {
   FieldHint,
   Input,
   Label,
-  Select,
 } from "@/components/ui/field";
 import { zodFieldErrors } from "@/lib/api";
 import { formatEventDateTime } from "@/lib/format";
@@ -27,8 +26,8 @@ export type GuestlistEventOption = {
 };
 
 type GuestlistFormProps = {
-  events: GuestlistEventOption[];
-  initialEventId?: string;
+  event: GuestlistEventOption;
+  guestlistToken: string;
   maxFileMb: number;
   turnstileSiteKey: string;
 };
@@ -172,19 +171,13 @@ function SuccessPanel({ result }: { result: SubmissionResult }) {
 }
 
 export function GuestlistForm({
-  events,
-  initialEventId,
+  event,
+  guestlistToken,
   maxFileMb,
   turnstileSiteKey,
 }: GuestlistFormProps) {
   const baseId = useId();
-  const [eventId, setEventId] = useState(() => {
-    if (initialEventId && events.some((event) => event.id === initialEventId)) {
-      return initialEventId;
-    }
-
-    return events[0]?.id ?? "";
-  });
+  const eventId = event.id;
   const [fullName, setFullName] = useState("");
   const [instagram, setInstagram] = useState("");
   const [referencePerson, setReferencePerson] = useState("");
@@ -197,12 +190,9 @@ export function GuestlistForm({
   const [progress, setProgress] = useState<string | null>(null);
   const [state, setState] = useState<SubmitState>("idle");
   const [result, setResult] = useState<SubmissionResult | null>(null);
-  const [submissionKey, setSubmissionKey] = useState(() =>
-    crypto.randomUUID(),
-  );
+  const [submissionKey] = useState(() => crypto.randomUUID());
 
   const busy = state === "uploading" || state === "submitting";
-  const selectedEvent = events.find((event) => event.id === eventId);
   const prefix = `${baseId}-`;
 
   function clearFieldError(field: string) {
@@ -235,6 +225,7 @@ export function GuestlistForm({
       headers: { "content-type": "application/json" },
       body: JSON.stringify({
         eventId,
+        guestlistToken,
         slot,
         mimeType: proof.mimeType,
         size: proof.size,
@@ -319,10 +310,6 @@ export function GuestlistForm({
 
     const missing: Record<string, string> = {};
 
-    if (!eventId) {
-      missing.eventId = "Choose an event.";
-    }
-
     if (!storyProof) {
       missing.storyProof = "Upload your Instagram story proof.";
     }
@@ -366,6 +353,7 @@ export function GuestlistForm({
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
           eventId,
+          guestlistToken,
           submissionKey,
           fullName: parsed.data.fullName,
           instagram: parsed.data.instagram,
@@ -426,38 +414,17 @@ export function GuestlistForm({
       ) : null}
 
       <div className="grid gap-6 sm:grid-cols-2">
-        <div className="sm:col-span-2">
-          <Label htmlFor={`${prefix}event`}>Event</Label>
-          <Select
-            id={`${prefix}event`}
-            name="eventId"
-            value={eventId}
-            onChange={(event) => {
-              setEventId(event.target.value);
-              setSubmissionKey(crypto.randomUUID());
-              clearFieldError("eventId");
-            }}
-            disabled={busy}
-            aria-invalid={fieldErrors.eventId ? true : undefined}
-            aria-describedby={`${prefix}event-hint ${prefix}event-error`}
-          >
-            {events.map((event) => (
-              <option key={event.id} value={event.id}>
-                {event.name} — {formatEventDateTime(event.eventDate)}
-              </option>
-            ))}
-          </Select>
-
-          {selectedEvent ? (
-            <FieldHint id={`${prefix}event-hint`}>
-              {formatEventDateTime(selectedEvent.eventDate)}
-              {selectedEvent.venue ? ` · ${selectedEvent.venue}` : ""}
-            </FieldHint>
-          ) : null}
-
-          <FieldError id={`${prefix}event-error`}>
-            {fieldErrors.eventId}
-          </FieldError>
+        <div className="border border-line bg-ink p-4 sm:col-span-2">
+          <p className="font-mono text-[0.6rem] uppercase tracking-[0.12em] text-accent">
+            Guestlist for
+          </p>
+          <p className="mt-2 font-display text-xl uppercase leading-tight">
+            {event.name}
+          </p>
+          <p className="mt-1 font-mono text-[0.65rem] uppercase tracking-[0.08em] text-muted">
+            {formatEventDateTime(event.eventDate)}
+            {event.venue ? ` · ${event.venue}` : ""}
+          </p>
         </div>
 
         <div>

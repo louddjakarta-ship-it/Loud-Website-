@@ -49,8 +49,10 @@ export type Database = {
           description: string | null;
           event_date: string;
           flyer_path: string | null;
+          guestlist_token: string;
           id: string;
           is_published: boolean;
+          maps_url: string | null;
           name: string;
           registration_open: boolean;
           slug: string;
@@ -65,8 +67,10 @@ export type Database = {
           description?: string | null;
           event_date: string;
           flyer_path?: string | null;
+          guestlist_token?: string;
           id?: string;
           is_published?: boolean;
+          maps_url?: string | null;
           name: string;
           registration_open?: boolean;
           slug: string;
@@ -81,8 +85,10 @@ export type Database = {
           description?: string | null;
           event_date?: string;
           flyer_path?: string | null;
+          guestlist_token?: string;
           id?: string;
           is_published?: boolean;
+          maps_url?: string | null;
           name?: string;
           registration_open?: boolean;
           slug?: string;
@@ -93,6 +99,38 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "events_created_by_fkey";
+            columns: ["created_by"];
+            isOneToOne: false;
+            referencedRelation: "admin_profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      gallery_photos: {
+        Row: {
+          caption: string | null;
+          created_at: string;
+          created_by: string | null;
+          id: string;
+          storage_path: string;
+        };
+        Insert: {
+          caption?: string | null;
+          created_at?: string;
+          created_by?: string | null;
+          id?: string;
+          storage_path: string;
+        };
+        Update: {
+          caption?: string | null;
+          created_at?: string;
+          created_by?: string | null;
+          id?: string;
+          storage_path?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "gallery_photos_created_by_fkey";
             columns: ["created_by"];
             isOneToOne: false;
             referencedRelation: "admin_profiles";
@@ -163,6 +201,38 @@ export type Database = {
           },
         ];
       };
+      site_settings: {
+        Row: {
+          hero_description: string;
+          hero_tagline: string;
+          id: boolean;
+          updated_at: string;
+          updated_by: string | null;
+        };
+        Insert: {
+          hero_description: string;
+          hero_tagline: string;
+          id?: boolean;
+          updated_at?: string;
+          updated_by?: string | null;
+        };
+        Update: {
+          hero_description?: string;
+          hero_tagline?: string;
+          id?: boolean;
+          updated_at?: string;
+          updated_by?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "site_settings_updated_by_fkey";
+            columns: ["updated_by"];
+            isOneToOne: false;
+            referencedRelation: "admin_profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       submission_attempts: {
         Row: {
           created_at: string;
@@ -200,7 +270,19 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
-      [_ in never]: never;
+      get_guestlist_event_link: {
+        Args: { link_token: string };
+        Returns: {
+          description: string | null;
+          event_date: string;
+          flyer_path: string | null;
+          id: string;
+          name: string;
+          slug: string;
+          venue: string | null;
+          whatsapp_number: string | null;
+        }[];
+      };
     };
     Enums: {
       admin_role: "super_admin" | "staff";

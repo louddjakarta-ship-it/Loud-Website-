@@ -2,18 +2,16 @@ import "server-only";
 
 import { randomUUID } from "node:crypto";
 
+import {
+  detectImageMime,
+  extensionForImageMime,
+} from "@/lib/images/magic-bytes";
 import { PROOF_BUCKET } from "@/lib/storage/constants";
 import { createAdminSupabaseClient } from "@/lib/supabase/admin";
 import {
   PROOF_MIME_TYPES,
   type ProofMimeType,
 } from "@/lib/validation/guestlist";
-
-const EXTENSION_BY_MIME: Record<ProofMimeType, string> = {
-  "image/jpeg": "jpg",
-  "image/png": "png",
-  "image/webp": "webp",
-};
 
 const UUID_SEGMENT =
   "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}";
@@ -48,7 +46,7 @@ export function createProofPath(
   eventId: string,
   mimeType: ProofMimeType,
 ): string {
-  return `${eventId}/${randomUUID()}.${EXTENSION_BY_MIME[mimeType]}`;
+  return `${eventId}/${randomUUID()}.${extensionForImageMime(mimeType)}`;
 }
 
 /**
@@ -72,47 +70,8 @@ export async function createProofUploadTarget(
   return { path: data.path, token: data.token };
 }
 
-/** Detects the real image type from magic bytes, ignoring the claimed MIME. */
-export function detectProofMime(bytes: Uint8Array): ProofMimeType | null {
-  if (
-    bytes.length >= 3 &&
-    bytes[0] === 0xff &&
-    bytes[1] === 0xd8 &&
-    bytes[2] === 0xff
-  ) {
-    return "image/jpeg";
-  }
-
-  if (
-    bytes.length >= 8 &&
-    bytes[0] === 0x89 &&
-    bytes[1] === 0x50 &&
-    bytes[2] === 0x4e &&
-    bytes[3] === 0x47 &&
-    bytes[4] === 0x0d &&
-    bytes[5] === 0x0a &&
-    bytes[6] === 0x1a &&
-    bytes[7] === 0x0a
-  ) {
-    return "image/png";
-  }
-
-  if (
-    bytes.length >= 12 &&
-    bytes[0] === 0x52 &&
-    bytes[1] === 0x49 &&
-    bytes[2] === 0x46 &&
-    bytes[3] === 0x46 &&
-    bytes[8] === 0x57 &&
-    bytes[9] === 0x45 &&
-    bytes[10] === 0x42 &&
-    bytes[11] === 0x50
-  ) {
-    return "image/webp";
-  }
-
-  return null;
-}
+/** @deprecated Use `detectImageMime` from `@/lib/images/magic-bytes`. */
+export const detectProofMime = detectImageMime;
 
 export type ProofVerification =
   | { ok: true; mimeType: ProofMimeType; size: number }
@@ -155,7 +114,7 @@ export async function verifyProofObject(
     return { ok: false, reason: "invalid_type" };
   }
 
-  const expectedExtension = EXTENSION_BY_MIME[mimeType];
+  const expectedExtension = extensionForImageMime(mimeType);
   const actualExtension =
     parsed.extension === "jpeg" ? "jpg" : parsed.extension;
 

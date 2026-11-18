@@ -1,12 +1,16 @@
 # LOUD JAKARTA
 
-Website event organizer LOUD JAKARTA: upcoming events, RSVP WhatsApp, guestlist
-dengan bukti Instagram, dan admin dashboard untuk verifikasi.
+Website event organizer LOUD JAKARTA: upcoming events, RSVP WhatsApp, gallery
+foto, dan guestlist privat lewat link yang dibagikan admin.
 
-Status: **PHASE 3 — Public website selesai di lokal**. Homepage, RSVP WhatsApp,
-guestlist form + dua upload bukti, privacy notice, 404, sitemap/robots sudah
-terhubung ke Supabase. Admin dashboard menyusul di PHASE 4. Lihat
-`docs/PHASE-3-PUBLIC.md` untuk hasil verifikasi dan sisa pekerjaan.
+Status: **PHASE 4 — Admin dashboard selesai di lokal**. Public website
+(homepage, RSVP WhatsApp, gallery) dan admin dashboard (login, event
+management, gallery, homepage copy, guestlist link, review guestlist, CSV
+export) sudah terhubung ke Supabase.
+Guestlist bersifat **link-only**: pengunjung hanya melihat upcoming events,
+sedangkan form guestlist hanya terbuka lewat `/guestlist/<token>` yang
+di-copy admin dari `/admin/events`. Lihat `docs/PHASE-4-ADMIN.md` untuk hasil
+verifikasi dan sisa pekerjaan menuju PHASE 5 (Security & QA).
 
 ## Stack
 
@@ -24,7 +28,9 @@ terhubung ke Supabase. Admin dashboard menyusul di PHASE 4. Lihat
 
 - Node.js **20.9+** (disarankan LTS terbaru)
 - npm
-- Akun Supabase (untuk PHASE 3+)
+- Akun Supabase
+- Akun admin di Supabase Auth + baris `admin_profiles` (lihat
+  `docs/SUPABASE_SETUP.md` §7)
 
 Cek versi:
 
@@ -68,6 +74,52 @@ Aturan: variabel server-only **tidak boleh** diberi prefix `NEXT_PUBLIC_` dan
 tidak boleh di-import dari Client Component. Semua akses secret melewati
 `src/lib/env/server.ts` (`import "server-only"`).
 
+## Guestlist link (privat)
+
+Guestlist tidak punya halaman publik. Alurnya:
+
+1. Login admin → `/admin/events`.
+2. Klik **Copy guestlist link** pada event yang sudah published dan
+   `registration_open`.
+3. Kirim link `https://<site>/guestlist/<token>` ke tamu.
+4. Tamu mengisi form yang sudah terkunci ke event tersebut; admin mereview di
+   `/admin/guestlist`.
+
+Catatan keamanan:
+
+- `/guestlist` selalu `404`; hanya `/guestlist/<token>` yang valid bisa dibuka.
+- `events.guestlist_token` adalah UUID acak dan tidak bisa dibaca `anon`.
+  Resolusi token memakai RPC `get_guestlist_event_link`.
+- Link mati otomatis saat event di-unpublish, di-archive, `registration_open`
+  dimatikan, atau tanggal event lewat.
+- Cabut link lama dengan merotasi token:
+
+  ```sql
+  update public.events
+  set guestlist_token = gen_random_uuid()
+  where id = '<event-id>';
+  ```
+
+## Gallery homepage
+
+- Foto gallery tampil di section `/#gallery` pada homepage. Section otomatis
+  disembunyikan jika belum ada foto.
+- Hanya admin aktif yang bisa upload/delete, lewat `/admin/gallery`.
+- Foto dikompres di browser (crop paksa 16:9, maks 2400 px, WebP) lalu
+  diunggah langsung ke
+  bucket publik `gallery-photos` memakai sesi admin; metadata dicatat server
+  action ke tabel `gallery_photos`.
+- Pengunjung hanya bisa membaca. Upload anon ditolak Storage RLS, insert anon
+  ditolak RLS tabel (`42501`).
+- Upload **tidak** memakai `SUPABASE_SECRET_KEY`, jadi tetap berfungsi walau
+  secret belum diisi.
+
+## Homepage copy
+
+Tagline dan description hero bisa diedit dari section **Homepage copy** di
+`/admin`, disimpan di tabel singleton `site_settings`. Publik hanya bisa
+membaca; perubahan langsung tampil setelah disimpan.
+
 ## Scripts
 
 | Perintah | Fungsi |
@@ -85,21 +137,27 @@ tidak boleh di-import dari Client Component. Semua akses secret melewati
 ```text
 src/
 ├── app/
-│   ├── (site)/          # homepage, guestlist, privacy (public layout)
-│   ├── api/guestlist/   # signed upload URL + final submission
+│   ├── (site)/          # homepage, guestlist privat, privacy (public layout)
+│   ├── admin/           # login, dashboard, events, gallery, guestlist, actions
+│   ├── api/
+│   │   ├── guestlist/   # signed upload URL + final submission
+│   │   └── admin/       # CSV export + signed proof URL
 │   ├── not-found.tsx
 │   ├── robots.ts
 │   └── sitemap.ts
 ├── components/
-│   ├── public/          # header, hero, event card, form, footer
+│   ├── admin/           # shell, event form, gallery upload, login form, confirm form
+│   ├── public/          # header, hero, event card, gallery, form, footer
 │   └── ui/              # button, field primitives
 ├── lib/
+│   ├── admin/           # guestlist filter parsing, action state
+│   ├── auth/            # session guard + role checks
 │   ├── data/            # public event queries
 │   ├── env/             # validasi env public vs server-only
-│   ├── images/          # kompresi bukti di browser
-│   ├── storage/         # path, signed upload, magic bytes
+│   ├── images/          # kompresi bukti/flyer + magic bytes
+│   ├── storage/         # path, signed upload, verifikasi bukti
 │   ├── supabase/        # browser, server, admin, proxy clients
-│   ├── validation/      # Zod schema guestlist
+│   ├── validation/      # Zod schema guestlist + event
 │   ├── api.ts
 │   ├── format.ts
 │   ├── rate-limit.ts
@@ -109,13 +167,15 @@ src/
 └── proxy.ts             # Next.js 16 Proxy (pengganti middleware)
 supabase/
 ├── migrations/          # schema + hardening + rate-limit kind
-└── seed.sql             # satu event placeholder (unpublished)
+├── seed.sql             # satu event placeholder (unpublished)
+└── seed-demo.sql        # 5 event dummy published (khusus preview lokal)
 scripts/
 └── cleanup-orphans.mjs  # hapus bukti yang tidak direferensikan
 docs/
 ├── PHASE-1-PLANNING.md
 ├── PHASE-2-SETUP.md
 ├── PHASE-3-PUBLIC.md
+├── PHASE-4-ADMIN.md
 └── SUPABASE_SETUP.md
 ```
 
@@ -130,6 +190,18 @@ docs/
    (limit body Vercel ~4.5 MB tidak cukup untuk 2×5 MB).
 4. **Accent color** `#C6FF00` adalah placeholder; ubah di
    `src/styles/globals.css` (`--color-accent`).
+
+## Admin
+
+- Login: `http://localhost:3000/admin/login` (Supabase Auth).
+- Akun harus punya baris aktif di `admin_profiles`; jika tidak, login ditolak.
+- Role: `super_admin` (semua aksi) dan `staff` (event + review guestlist).
+  Arsip/hapus event, hapus pendaftar, dan CSV export khusus super admin.
+- Izin diperiksa di server action/route handler dan database, bukan hanya UI.
+- Review guestlist mencatat reviewer dan waktu lewat trigger database.
+- Preview bukti memakai signed URL yang berlaku 60 detik.
+
+Panduan operasional ada di `docs/PHASE-4-ADMIN.md`.
 
 ## Keamanan
 
@@ -150,4 +222,5 @@ docs/
 - `docs/PHASE-1-PLANNING.md` — sitemap, flow, schema, keamanan, design system
 - `docs/PHASE-2-SETUP.md` — setup Next.js, Tailwind, Supabase client
 - `docs/PHASE-3-PUBLIC.md` — hasil public website + verifikasi
+- `docs/PHASE-4-ADMIN.md` — hasil admin dashboard, izin, audit, verifikasi
 - `docs/SUPABASE_SETUP.md` — kredensial, migration, admin pertama

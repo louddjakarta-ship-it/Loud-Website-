@@ -31,8 +31,8 @@ export function SiteFooter() {
           <Link href="/#events" className="text-paper hover:text-accent">
             Upcoming events
           </Link>
-          <Link href="/guestlist" className="text-paper hover:text-accent">
-            Guestlist
+          <Link href="/#gallery" className="text-paper hover:text-accent">
+            Gallery
           </Link>
           <Link href="/privacy" className="text-paper hover:text-accent">
             Privacy

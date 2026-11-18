@@ -1,5 +1,4 @@
 import Image from "next/image";
-import Link from "next/link";
 
 import { ButtonLink } from "@/components/ui/button";
 import { getFlyerPublicUrl, type PublicEvent } from "@/lib/data/events";
@@ -79,6 +78,18 @@ export function EventCard({ event }: { event: PublicEvent }) {
           <p className="mt-2 text-sm text-muted">
             {event.venue?.trim() || "Venue TBA"}
           </p>
+
+          {event.maps_url ? (
+            <a
+              href={event.maps_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={`Open the location of ${event.name} in Google Maps`}
+              className="mt-3 inline-flex items-center gap-1.5 border border-line px-3 py-1.5 font-mono text-[0.6rem] uppercase tracking-[0.1em] text-muted transition-colors hover:border-accent hover:text-accent"
+            >
+              Open in Google Maps ↗
+            </a>
+          ) : null}
         </div>
 
         {event.description ? (
@@ -106,15 +117,6 @@ export function EventCard({ event }: { event: PublicEvent }) {
               RSVP contact coming soon
             </span>
           )}
-
-          {event.registration_open ? (
-            <Link
-              href={`/guestlist?event=${event.id}`}
-              className="font-mono text-micro uppercase tracking-[0.12em] text-muted underline decoration-line underline-offset-4 transition-colors hover:text-accent"
-            >
-              Guestlist
-            </Link>
-          ) : null}
         </div>
       </div>
     </article>

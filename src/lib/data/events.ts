@@ -16,12 +16,13 @@ export type PublicEvent = Pick<
   | "flyer_path"
   | "event_date"
   | "venue"
+  | "maps_url"
   | "whatsapp_number"
   | "registration_open"
 >;
 
 const PUBLIC_EVENT_COLUMNS =
-  "id,name,slug,description,flyer_path,event_date,venue,whatsapp_number,registration_open";
+  "id,name,slug,description,flyer_path,event_date,venue,maps_url,whatsapp_number,registration_open";
 
 function nowIso(): string {
   return new Date().toISOString();
@@ -45,30 +46,54 @@ export async function getUpcomingPublicEvents(): Promise<PublicEvent[]> {
   return data ?? [];
 }
 
-/** Published events that are still accepting guestlist registrations. */
-export async function getOpenGuestlistEvents(): Promise<PublicEvent[]> {
+/**
+ * Resolves a private guestlist share link through the token-scoped RPC. The
+ * token column itself is never readable by anon, and the function filters out
+ * events that are unpublished, archived, closed or already past.
+ *
+ * Returns null when the token is unknown or the event is not open.
+ */
+export async function getEventByGuestlistToken(
+  token: string,
+): Promise<PublicEvent | null> {
   const supabase = await createServerSupabaseClient();
-  const { data, error } = await supabase
-    .from("events")
-    .select(PUBLIC_EVENT_COLUMNS)
-    .eq("is_published", true)
-    .eq("registration_open", true)
-    .is("archived_at", null)
-    .gte("event_date", nowIso())
-    .order("event_date", { ascending: true });
+  const { data, error } = await supabase.rpc("get_guestlist_event_link", {
+    link_token: token,
+  });
 
   if (error) {
-    throw new Error("events_unavailable");
+    throw new Error("event_lookup_failed");
   }
 
-  return data ?? [];
+  const row = data?.[0];
+
+  if (!row) {
+    return null;
+  }
+
+  return {
+    id: row.id,
+    name: row.name,
+    slug: row.slug,
+    description: row.description,
+    flyer_path: row.flyer_path,
+    event_date: row.event_date,
+    venue: row.venue,
+    maps_url: null,
+    whatsapp_number: row.whatsapp_number,
+    registration_open: true,
+  };
 }
 
 /**
  * Server-side check used by both guestlist endpoints. Uses the service role so
- * a stale client cannot submit to an event that has just been closed.
+ * a stale client cannot submit to an event that has just been closed, and
+ * requires the event's share token so the API cannot be used without a link.
  */
-export async function getEventForSubmission(eventId: string): Promise<{
+export async function getEventForSubmission(
+  eventId: string,
+  guestlistToken: string,
+): Promise<{
   id: string;
   event_date: string;
 } | null> {
@@ -77,6 +102,7 @@ export async function getEventForSubmission(eventId: string): Promise<{
     .from("events")
     .select("id,event_date,is_published,registration_open,archived_at")
     .eq("id", eventId)
+    .eq("guestlist_token", guestlistToken)
     .maybeSingle();
 
   if (error) {

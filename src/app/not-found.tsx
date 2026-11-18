@@ -37,12 +37,6 @@ export default function NotFound() {
             >
               Back to home
             </Link>
-            <Link
-              href="/guestlist"
-              className="inline-flex h-11 items-center border border-line px-5 font-mono text-micro uppercase tracking-[0.12em] text-paper transition-colors hover:border-accent hover:text-accent"
-            >
-              Guestlist
-            </Link>
           </div>
         </div>
       </main>

@@ -63,17 +63,11 @@ export function SiteHeader() {
               href={whatsappUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="font-mono text-micro uppercase tracking-[0.12em] text-accent transition-colors hover:text-paper"
+              className="border border-accent bg-accent px-4 py-2.5 font-mono text-micro uppercase tracking-[0.12em] text-ink transition-colors hover:bg-paper"
             >
-              WhatsApp
+              RSVP WhatsApp
             </a>
           ) : null}
-          <Link
-            href="/guestlist"
-            className="border border-accent bg-accent px-4 py-2.5 font-mono text-micro uppercase tracking-[0.12em] text-ink transition-colors hover:bg-paper"
-          >
-            Join guestlist
-          </Link>
         </div>
 
         <MobileNav

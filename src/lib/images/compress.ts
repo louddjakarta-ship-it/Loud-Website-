@@ -1,7 +1,12 @@
 import type { ProofMimeType } from "@/lib/validation/guestlist";
 
-const MAX_DIMENSION = 1600;
-const WEBP_QUALITY = 0.82;
+const PROOF_MAX_DIMENSION = 1600;
+const PROOF_WEBP_QUALITY = 0.82;
+const FLYER_MAX_DIMENSION = 2000;
+const FLYER_WEBP_QUALITY = 0.85;
+const GALLERY_MAX_DIMENSION = 2400;
+const GALLERY_WEBP_QUALITY = 0.86;
+const GALLERY_ASPECT_RATIO = 16 / 9;
 const ALLOWED_OUTPUT_TYPES = new Set<ProofMimeType>([
   "image/jpeg",
   "image/png",
@@ -60,12 +65,21 @@ async function loadImage(file: File): Promise<LoadedImage> {
   }
 }
 
-/**
- * Compresses a proof image in the browser before upload: longest side max
- * 1600 px, WebP at quality 0.82. Keeps uploads fast and storage small.
- */
-export async function compressProofImage(
+async function compressImage(
   file: File,
+  {
+    maxDimension,
+    quality,
+    aspectRatio,
+  }: {
+    maxDimension: number;
+    quality: number;
+    /**
+     * When set, the image is centre-cropped to this ratio (width / height)
+     * before scaling. Used to force gallery uploads to 16:9.
+     */
+    aspectRatio?: number;
+  },
 ): Promise<CompressedImage> {
   const loaded = await loadImage(file);
 
@@ -74,12 +88,36 @@ export async function compressProofImage(
       throw new Error("image_decode_failed");
     }
 
+    let sourceX = 0;
+    let sourceY = 0;
+    let sourceWidth = loaded.width;
+    let sourceHeight = loaded.height;
+
+    if (aspectRatio) {
+      const currentRatio = loaded.width / loaded.height;
+
+      if (currentRatio > aspectRatio) {
+        // Too wide: trim the left/right edges evenly.
+        sourceWidth = loaded.height * aspectRatio;
+        sourceX = (loaded.width - sourceWidth) / 2;
+      } else if (currentRatio < aspectRatio) {
+        // Too tall: trim the top/bottom edges evenly.
+        sourceHeight = loaded.width / aspectRatio;
+        sourceY = (loaded.height - sourceHeight) / 2;
+      }
+    }
+
     const scale = Math.min(
       1,
-      MAX_DIMENSION / Math.max(loaded.width, loaded.height),
+      maxDimension / Math.max(sourceWidth, sourceHeight),
     );
-    const width = Math.max(1, Math.round(loaded.width * scale));
-    const height = Math.max(1, Math.round(loaded.height * scale));
+    const width = Math.max(1, Math.round(sourceWidth * scale));
+    const height = Math.max(
+      1,
+      Math.round(
+        aspectRatio ? width / aspectRatio : sourceHeight * scale,
+      ),
+    );
 
     const canvas = document.createElement("canvas");
     canvas.width = width;
@@ -91,7 +129,17 @@ export async function compressProofImage(
       throw new Error("canvas_unavailable");
     }
 
-    context.drawImage(loaded.source, 0, 0, width, height);
+    context.drawImage(
+      loaded.source,
+      sourceX,
+      sourceY,
+      sourceWidth,
+      sourceHeight,
+      0,
+      0,
+      width,
+      height,
+    );
 
     const blob = await new Promise<Blob>((resolve, reject) => {
       canvas.toBlob(
@@ -103,7 +151,7 @@ export async function compressProofImage(
           }
         },
         "image/webp",
-        WEBP_QUALITY,
+        quality,
       );
     });
 
@@ -120,4 +168,39 @@ export async function compressProofImage(
   } finally {
     loaded.release();
   }
+}
+
+/**
+ * Compresses a guestlist proof in the browser: longest side max 1600 px,
+ * WebP at quality 0.82. Keeps uploads fast and storage small.
+ */
+export function compressProofImage(file: File): Promise<CompressedImage> {
+  return compressImage(file, {
+    maxDimension: PROOF_MAX_DIMENSION,
+    quality: PROOF_WEBP_QUALITY,
+  });
+}
+
+/**
+ * Compresses an event flyer in the browser: longest side max 2000 px, WebP at
+ * quality 0.85. Keeps the server action body under Vercel's request limit.
+ */
+export function compressFlyerImage(file: File): Promise<CompressedImage> {
+  return compressImage(file, {
+    maxDimension: FLYER_MAX_DIMENSION,
+    quality: FLYER_WEBP_QUALITY,
+  });
+}
+
+/**
+ * Compresses a gallery photo in the browser: centre-cropped to 16:9, longest
+ * side max 2400 px, WebP at quality 0.86. Uploaded straight to Storage so the
+ * action payload stays small.
+ */
+export function compressGalleryImage(file: File): Promise<CompressedImage> {
+  return compressImage(file, {
+    maxDimension: GALLERY_MAX_DIMENSION,
+    quality: GALLERY_WEBP_QUALITY,
+    aspectRatio: GALLERY_ASPECT_RATIO,
+  });
 }

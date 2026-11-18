@@ -43,7 +43,10 @@ export async function POST(request: Request) {
   const input = parsed.data;
 
   try {
-    const event = await getEventForSubmission(input.eventId);
+    const event = await getEventForSubmission(
+      input.eventId,
+      input.guestlistToken,
+    );
 
     if (!event) {
       return jsonError(

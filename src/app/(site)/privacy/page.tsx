@@ -118,16 +118,10 @@ export default function PrivacyPage() {
 
         <div className="mt-10 flex flex-wrap gap-3 border-t border-line pt-8">
           <Link
-            href="/guestlist"
+            href="/"
             className="inline-flex h-11 items-center border border-accent bg-accent px-5 font-mono text-micro uppercase tracking-[0.12em] text-ink transition-colors hover:bg-paper"
           >
-            Back to guestlist
-          </Link>
-          <Link
-            href="/"
-            className="inline-flex h-11 items-center border border-line px-5 font-mono text-micro uppercase tracking-[0.12em] text-paper transition-colors hover:border-accent hover:text-accent"
-          >
-            Home
+            Back to home
           </Link>
         </div>
       </div>

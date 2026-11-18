@@ -45,10 +45,6 @@ function EmptyState({ loadFailed }: { loadFailed?: boolean }) {
             Instagram link coming soon
           </span>
         )}
-
-        <ButtonLink href="/guestlist" variant="ghost">
-          Guestlist page
-        </ButtonLink>
       </div>
     </div>
   );
@@ -76,8 +72,8 @@ export function EventGrid({ events, loadFailed }: EventGridProps) {
           </div>
 
           <p className="max-w-xs text-sm leading-relaxed text-muted">
-            Flyer first. Details second. RSVP directly on WhatsApp or submit
-            your guestlist proof.
+            Flyer first. Details second. RSVP directly on WhatsApp — guestlist is
+            invite only.
           </p>
         </div>
 

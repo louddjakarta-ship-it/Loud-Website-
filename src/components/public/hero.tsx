@@ -1,8 +1,22 @@
 import Link from "next/link";
 
 import { ButtonLink } from "@/components/ui/button";
+import { publicEnv } from "@/lib/env/public";
+import { splitTagline } from "@/lib/site-settings";
+import { buildWhatsAppContactUrl } from "@/lib/whatsapp";
 
-export function Hero() {
+export function Hero({
+  tagline,
+  description,
+}: {
+  tagline: string;
+  description: string;
+}) {
+  const whatsappUrl = buildWhatsAppContactUrl(
+    publicEnv.defaultWhatsappNumber,
+  );
+  const taglineLines = splitTagline(tagline);
+
   return (
     <section className="relative overflow-hidden border-b border-line">
       <div
@@ -17,22 +31,35 @@ export function Hero() {
           </p>
 
           <h1 className="mt-6 font-display text-display-xl uppercase">
-            <span className="block">We make</span>
-            <span className="block text-accent">noise.</span>
+            {taglineLines.map((line, index) => (
+              <span
+                key={`${index}-${line}`}
+                className={index === 0 ? "block" : "block text-accent"}
+              >
+                {line}
+              </span>
+            ))}
           </h1>
 
           <p className="mt-8 max-w-xl text-balance text-lg leading-relaxed text-muted">
-            Underground nightlife, electronic music and contemporary culture.
-            We don&apos;t follow the noise. We make it.
+            {description}
           </p>
 
           <div className="mt-10 flex flex-wrap items-start gap-3">
-            <ButtonLink href="/guestlist" size="lg">
-              Join the guestlist
-            </ButtonLink>
-            <ButtonLink href="/#events" size="lg" variant="outline">
+            <ButtonLink href="/#events" size="lg">
               Upcoming events
             </ButtonLink>
+            {whatsappUrl ? (
+              <ButtonLink
+                href={whatsappUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                size="lg"
+                variant="outline"
+              >
+                RSVP via WhatsApp
+              </ButtonLink>
+            ) : null}
           </div>
         </div>
 

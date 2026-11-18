@@ -5,7 +5,10 @@
 -- into production by accident. No guestlist rows and no admin users are seeded.
 --
 -- Create the first admin manually:
---   see docs/ADMIN_SETUP.md (PHASE 4)
+--   see docs/SUPABASE_SETUP.md §7
+--
+-- For published demo events on a local preview, run supabase/seed-demo.sql
+-- instead. Never run seed-demo.sql against production.
 -- ============================================================================
 
 insert into public.events (

@@ -44,6 +44,7 @@ export const referencePersonSchema = z
   );
 
 export const eventIdSchema = z.uuid("Choose a valid event.");
+export const guestlistTokenSchema = z.uuid("Invalid guestlist link.");
 export const submissionKeySchema = z.uuid("Invalid submission key.");
 
 export const proofPathSchema = z
@@ -64,6 +65,7 @@ export function createUploadUrlRequestSchema(maxBytes: number) {
 
   return z.object({
     eventId: eventIdSchema,
+    guestlistToken: guestlistTokenSchema,
     slot: z.enum(["story", "comment"], "Choose a proof slot."),
     mimeType: z.enum(PROOF_MIME_TYPES, "Use a JPG, PNG or WEBP image."),
     size: z
@@ -85,6 +87,7 @@ export function createGuestlistSubmissionSchema() {
   return z
     .object({
       eventId: eventIdSchema,
+      guestlistToken: guestlistTokenSchema,
       submissionKey: submissionKeySchema,
       fullName: fullNameSchema,
       instagram: instagramSchema,

@@ -1,6 +1,6 @@
 export const primaryNav = [
   { href: "/#events", label: "Upcoming Events" },
-  { href: "/guestlist", label: "Guestlist" },
+  { href: "/#gallery", label: "Gallery" },
 ] as const;
 
 export type PrimaryNavItem = (typeof primaryNav)[number];

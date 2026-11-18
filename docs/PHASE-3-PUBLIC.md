@@ -4,6 +4,11 @@ Status: **implemented locally, build passing, end-to-end guestlist submission
 pending a real `SUPABASE_SECRET_KEY`.**
 Tanggal: 16 November 2026
 
+> **Revisi 17 November 2026 — guestlist link-only.** Guestlist bukan lagi
+> halaman publik. Setiap event punya token acak dan admin membagikan
+> `/guestlist/<token>` langsung ke tamu. Pengunjung umum hanya melihat
+> upcoming events + tombol RSVP WhatsApp. Detail di §9.
+
 Dokumen acuan: `docs/PHASE-1-PLANNING.md` §3, §4.3, §6, §7 dan
 `LOUD_JAKARTA_Master_Prompt.md` §4–5.
 
@@ -13,11 +18,14 @@ Dokumen acuan: `docs/PHASE-1-PLANNING.md` §3, §4.3, §6, §7 dan
 
 | Area | Status | File utama |
 |------|--------|------------|
-| Homepage (header, hero, event grid, guestlist CTA, footer) | Selesai | `src/app/(site)/page.tsx`, `src/components/public/*` |
+| Homepage (header, hero, event grid, footer) | Selesai | `src/app/(site)/page.tsx`, `src/components/public/*` |
+| Hero tagline + description dari `site_settings` (fallback default) | Selesai | `src/lib/data/site-settings.ts` |
 | Event cards dari database + flyer/placeholder | Selesai | `src/components/public/event-card.tsx`, `src/lib/data/events.ts` |
 | WhatsApp RSVP per event + fallback env + disabled state | Selesai | `src/lib/whatsapp.ts` |
-| Guestlist page + event selection | Selesai | `src/app/(site)/guestlist/page.tsx` |
-| Guestlist form 5 field + 2 upload | Selesai | `src/components/public/guestlist-form.tsx` |
+| Link Google Maps per event (opsional, tampil di card) | Selesai | `src/components/public/event-card.tsx` |
+| Gallery foto homepage (admin upload, publik lihat) | Selesai | `src/components/public/gallery.tsx`, `src/lib/data/gallery.ts` |
+| Guestlist link privat per event (`/guestlist/[token]`) | Selesai | `src/app/(site)/guestlist/[token]/page.tsx` |
+| Guestlist form 5 field + 2 upload (event terkunci ke link) | Selesai | `src/components/public/guestlist-form.tsx` |
 | Kompresi + preview + drag/drop + progress | Selesai | `src/lib/images/compress.ts`, `src/components/public/proof-upload.tsx` |
 | Signed upload URL (direct-to-storage) | Selesai | `src/app/api/guestlist/upload-url/route.ts` |
 | Final submission + magic-byte verification + duplicate handling | Selesai | `src/app/api/guestlist/route.ts`, `src/lib/storage/proofs.ts` |
@@ -34,11 +42,12 @@ Dokumen acuan: `docs/PHASE-1-PLANNING.md` §3, §4.3, §6, §7 dan
 | Route | Tipe | Catatan |
 |-------|------|---------|
 | `/` | RSC (dynamic) | Event published, belum mulai, belum archived |
-| `/guestlist` | RSC + client form | Hanya event `registration_open` |
+| `/guestlist` | RSC | Selalu `404` — pintu masuk hanya lewat link admin |
+| `/guestlist/[token]` | RSC + client form | Token UUID per event, event terkunci |
 | `/privacy` | Static RSC | Privacy notice |
-| `/api/guestlist/upload-url` | POST | Signed upload URL per slot |
-| `/api/guestlist` | POST | Validasi final + insert `pending` |
-| `/sitemap.xml`, `/robots.txt` | Metadata route | `/admin` dan `/api` disallow |
+| `/api/guestlist/upload-url` | POST | Signed upload URL per slot, wajib `guestlistToken` |
+| `/api/guestlist` | POST | Validasi final + insert `pending`, wajib `guestlistToken` |
+| `/sitemap.xml`, `/robots.txt` | Metadata route | `/admin`, `/api`, `/guestlist` disallow |
 | `/icon.svg` | Static | Favicon placeholder |
 
 Tidak ada halaman detail event pada MVP; semua informasi ada di card.
@@ -49,14 +58,14 @@ Tidak ada halaman detail event pada MVP; semua informasi ada di card.
 
 ```text
 Browser                          Server                         Supabase
-  │ 1. POST /api/guestlist/upload-url { eventId, slot, mime, size }
-  │ ─────────────────────────────► │ cek event open
+  │ 1. POST /api/guestlist/upload-url { eventId, guestlistToken, slot, mime, size }
+  │ ─────────────────────────────► │ cek event + token cocok
   │                                │ rate limit (10 / 10 menit / IP hash)
   │                                │ buat path + signed upload token
   │ 2. { path, token } ◄─────────── │
   │ 3. uploadToSignedUrl(path, token, blob) ─────────────────────► storage
-  │ 4. POST /api/guestlist { fields, paths, submissionKey, turnstileToken }
-  │ ─────────────────────────────► │ cek event open
+  │ 4. POST /api/guestlist { fields, eventId, guestlistToken, paths, submissionKey, turnstileToken }
+  │ ─────────────────────────────► │ cek event + token cocok
   │                                │ rate limit (5 / jam / IP hash)
   │                                │ download 2 file + magic bytes + size
   │                                │ verifikasi Turnstile (jika aktif)
@@ -109,8 +118,11 @@ Smoke test dengan `next dev` + event placeholder published sementara:
 
 | Cek | Hasil |
 |-----|-------|
-| `GET /` | `200`, event placeholder + `31 DEC 2026 · 22:00 WIB` tampil dari DB |
-| `GET /guestlist` | `200`, form + 5 field + 2 upload tampil |
+| `GET /` | `200`, 5 event demo tampil |
+| `GET /guestlist` | `404` — pintu publik ditutup |
+| `GET /guestlist/<token valid>` | `200`, form tampil dengan event terkunci ke link |
+| `GET /guestlist/<token tidak dikenal>` | `404` |
+| `GET /guestlist/<bukan-uuid>` | `404` |
 | `GET /privacy` | `200` |
 | `GET /does-not-exist` | `404` + brand 404 page |
 | `GET /robots.txt` | Disallow `/admin`, `/api` |
@@ -151,8 +163,10 @@ where slug = 'placeholder-loud-jakarta-001';
 
 Setelah secret asli diisi dan dev server direstart, uji:
 
-1. Buka `/guestlist`, pilih event placeholder.
-2. Isi nama, Instagram, PR.
+1. Login admin, buka `/admin/events`, klik **Copy guestlist link** pada event
+   yang `registration_open`.
+2. Buka link `/guestlist/<token>` tersebut.
+3. Isi nama, Instagram, PR.
 3. Upload dua gambar JPG/PNG/WEBP.
 4. Submit → harus muncul status `PENDING`.
 5. Cek database:
@@ -231,4 +245,93 @@ src/lib/whatsapp.ts
 src/lib/supabase/{browser,server,admin}.ts  # Database generic
 scripts/cleanup-orphans.mjs
 supabase/migrations/20261116100000_submission_attempt_kind.sql
+src/app/(site)/guestlist/[token]/page.tsx
+src/components/admin/copy-guestlist-link.tsx
+supabase/migrations/20261117093000_guestlist_share_token.sql
+supabase/migrations/20261117094500_guestlist_link_lookup.sql
+src/components/public/gallery.tsx
+src/lib/data/gallery.ts
+src/lib/storage/constants.ts          # FLYER_BUCKET + GALLERY_BUCKET
+supabase/migrations/20261117115000_gallery_photos.sql
 ```
+
+---
+
+## 9. Revisi — guestlist link-only
+
+### Alur
+
+1. Admin membuat event di `/admin/events/new` (event otomatis dapat token).
+2. Admin membuka `/admin/events`, klik **Copy guestlist link**, lalu mengirim
+   `https://<site>/guestlist/<token>` ke tamu yang diundang.
+3. Tamu membuka link → form langsung terkunci ke event tersebut (tidak ada
+   pemilih event).
+4. Submit tetap lewat validasi server: `eventId` + `guestlistToken` harus
+   cocok dan event harus published, belum archived, `registration_open`, dan
+   tanggalnya belum lewat.
+5. Admin mereview di `/admin/guestlist` seperti biasa.
+
+### Keamanan token
+
+- Kolom `public.events.guestlist_token uuid not null unique default
+  gen_random_uuid()`.
+- `anon` **tidak** punya akses ke kolom token. Grant `select` tabel-level
+  dicabut dan diganti daftar kolom publik tanpa `guestlist_token`.
+- Halaman link memakai RPC `public.get_guestlist_event_link(link_token uuid)`
+  (`SECURITY DEFINER`). Fungsi hanya mengembalikan field publik untuk token
+  yang persis cocok dan tidak pernah mengembalikan token itu sendiri.
+- `/guestlist` selalu `404`, `robots.txt` men-disallow `/guestlist`, halaman
+  token memakai `robots: noindex, nofollow`, dan entri sitemap dihapus.
+- Link bisa dicabut kapan saja dengan merotasi token:
+
+  ```sql
+  update public.events
+  set guestlist_token = gen_random_uuid()
+  where id = '<event-id>';
+  ```
+
+  Setelah rotasi, link lama langsung `404`.
+
+### Catatan
+
+- Guestlist hanya bisa diisi selama link valid. Menutup
+  `registration_open` atau meng-archive event mematikan link tanpa perlu
+  rotasi token.
+- Nomor WhatsApp event tetap dipakai untuk tombol RSVP publik; guestlist
+  tidak lagi ditautkan dari homepage, header, footer, atau event card.
+
+---
+
+## 10. Gallery homepage
+
+Gallery adalah section foto publik di bawah event grid. Tidak ada halaman
+terpisah dan tidak ada form upload untuk pengunjung — foto hanya bisa
+ditambahkan admin dari `/admin/gallery`.
+
+### Perilaku publik
+
+- `GET /#gallery` menampilkan maksimal 12 foto terbaru, urut `created_at
+  desc`, grid 2 kolom di mobile dan 3 kolom di desktop dengan frame **16:9**
+  (`object-cover`, jadi foto potret tetap rapi tanpa distorsi).
+- Caption opsional tampil sebagai overlay di bagian bawah foto.
+- Section **tidak dirender sama sekali** jika belum ada foto, jadi homepage
+  tetap bersih sebelum owner mengunggah foto asli.
+- Navigasi header dan footer punya anchor **Gallery** yang mengarah ke
+  `/#gallery`.
+- Jika query gallery gagal, homepage tetap tampil tanpa gallery (error hanya
+  dicatat di server).
+
+### Data dan keamanan
+
+- Metadata di `public.gallery_photos` (`storage_path`, `caption`,
+  `created_by`, `created_at`); file di bucket publik `gallery-photos`.
+- Upload admin dipotong paksa **16:9 dari tengah** di browser sebelum
+  dikompres ke WebP dan diunggah, jadi file yang tersimpan sudah 16:9 (bukan
+  hanya crop tampilan).
+- `anon` hanya bisa `SELECT` metadata dan membaca object publik.
+- Insert/delete metadata dibatasi RLS `private.is_admin()`; policy Storage
+  juga mensyaratkan role `authenticated` + `private.is_admin()`.
+- `storage_path` wajib UUID + ekstensi `webp|jpg|jpeg|png`, sehingga file di
+  bucket tidak bisa ditimpa nama bebas atau dipakai untuk path traversal.
+- Upload dari browser memakai sesi admin (bukan service role), jadi tidak
+  bergantung pada `SUPABASE_SECRET_KEY`.
