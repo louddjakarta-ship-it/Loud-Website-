@@ -4,8 +4,10 @@ Dokumen ini menjelaskan cara membawa project dari mesin lokal ke Vercel
 production. Semua langkah diuji terhadap build lokal Next.js 16; langkah yang
 butuh akun/domain milik owner ditandai jelas.
 
-Status saat dokumen ditulis (18 November 2026): aplikasi **belum di-deploy**.
-Repo lokal belum punya remote GitHub, dan domain final belum ditentukan.
+Status saat dokumen ditulis (18 November 2026): aplikasi **sudah di-deploy ke
+production** di https://loud-jakarta.vercel.app (project Vercel `loud-jakarta`,
+terhubung ke repo GitHub). Domain final belum ditentukan; langkah pemasangannya
+ada di `docs/CUSTOM_DOMAIN.md`.
 
 ---
 
@@ -90,7 +92,9 @@ migration. Tidak perlu membuat bucket manual.
 
 ## 4. Push ke GitHub
 
-Repo lokal belum punya remote. Buat repo kosong (tanpa README) di GitHub, lalu:
+Repo sudah punya remote `origin` →
+`https://github.com/louddjakarta-ship-it/Loud-Website-`. Untuk repo baru, buat
+repo kosong (tanpa README) di GitHub, lalu:
 
 ```bash
 git remote add origin https://github.com/<akun>/<repo>.git

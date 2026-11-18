@@ -3,14 +3,13 @@
 Website event organizer LOUD JAKARTA: upcoming events, RSVP WhatsApp, gallery
 foto, dan guestlist privat lewat link yang dibagikan admin.
 
-Status: **PHASE 5 — Security & QA selesai; PHASE 6 — Deployment siap
-dijalankan.** Public website (homepage, RSVP WhatsApp, gallery) dan admin
-dashboard (login, event management, gallery, homepage copy, guestlist link,
-review guestlist, CSV export) sudah terhubung ke Supabase. Deployment ke Vercel
-belum dilakukan karena menunggu project Vercel dan domain final dari owner;
-repo GitHub sudah aktif di
-`https://github.com/louddjakarta-ship-it/Loud-Website-` dan panduan lengkapnya
-sudah tersedia di `docs/DEPLOYMENT.md` dan `docs/CUSTOM_DOMAIN.md`.
+Status: **PHASE 5 — Security & QA selesai; PHASE 6 — Deployment production
+aktif.** Public website (homepage, RSVP WhatsApp, gallery) dan admin dashboard
+(login, event management, gallery, homepage copy, guestlist link, review
+guestlist, CSV export) sudah terhubung ke Supabase dan berjalan di
+**https://loud-jakarta.vercel.app**. Domain final masih menunggu owner;
+panduannya ada di `docs/CUSTOM_DOMAIN.md`. Data yang masih placeholder ada di
+`docs/CONFIGURATION_TODO.md`.
 Guestlist bersifat **link-only**: pengunjung hanya melihat upcoming events,
 sedangkan form guestlist hanya terbuka lewat `/guestlist/<token>` yang
 di-copy admin dari `/admin/events`.

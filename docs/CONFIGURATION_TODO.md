@@ -13,7 +13,7 @@ Terakhir diperbarui: 18 November 2026.
 |---|------|--------|---------|
 | 1 | Domain final | **Belum ada** | Owner |
 | 2 | Repo GitHub + remote | **Selesai** — `louddjakarta-ship-it/Loud-Website-`, branch `main` | Owner/dev |
-| 3 | Project Vercel + deploy production | **Belum ada** | Owner |
+| 3 | Project Vercel + deploy production | **Selesai** — `loud-jakarta`, https://loud-jakarta.vercel.app | Owner/dev |
 | 4 | Logo resmi | Placeholder (wordmark teks) | Owner/desain |
 | 5 | Nomor WhatsApp RSVP | Perlu konfirmasi | Owner |
 | 6 | Instagram resmi | Perlu konfirmasi | Owner |
@@ -53,9 +53,13 @@ Terakhir diperbarui: 18 November 2026.
 
 ### 3. Vercel
 
-- **Langkah:** import repo, isi env production/preview
-  (`docs/DEPLOYMENT.md` §5–§6), deploy, smoke test §7.
-- **Verifikasi:** homepage 200, `/admin` 307, CSP + HSTS ada.
+- **Status:** selesai. Project `loud-jakarta` terhubung ke repo GitHub dan
+  production live di https://loud-jakarta.vercel.app.
+- Env production sudah diisi (Supabase URL/publishable key, secret key, salt,
+  WhatsApp, Instagram, site URL, batas file); preview hanya env public.
+- **Sisa:** domain final (§1); env Turnstile bila diaktifkan (§12).
+- **Verifikasi:** `vercel whoami`, smoke test `docs/DEPLOYMENT.md` §7, dan
+  `qa:browser` production 245/245.
 
 ### 4. Logo
 
@@ -200,3 +204,4 @@ Isi lewat admin dashboard:
 |---------|-----------|------|
 | 18 Nov 2026 | Dokumen dibuat; status awal sebelum deploy | Dev |
 | 18 Nov 2026 | Repo GitHub `louddjakarta-ship-it/Loud-Website-` dibuat, branch `main` di-push | Dev |
+| 18 Nov 2026 | Deploy production Vercel `loud-jakarta` → https://loud-jakarta.vercel.app; QA production 245/245 | Dev |

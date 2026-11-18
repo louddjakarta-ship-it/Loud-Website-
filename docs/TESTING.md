@@ -223,6 +223,10 @@ konfigurasi lint; ditunda ke PHASE 6 sambil memantau rilis
 - axe (WCAG 2.0/2.1 A + AA) tanpa pelanggaran.
 - Tidak ada error console/page dan tidak ada pelanggaran CSP.
 
+Run yang sama juga dijalankan terhadap production
+`https://loud-jakarta.vercel.app` dengan hasil **245/245 PASS**, termasuk
+header CSP/HSTS dan redirect `/admin`.
+
 Bug yang ditemukan dan diperbaiki:
 
 1. **Kontras label footer** `text-muted/60` hanya 2.73:1. Diganti `text-muted`
