@@ -12,7 +12,7 @@ sedangkan form guestlist hanya terbuka lewat `/guestlist/<token>` yang
 di-copy admin dari `/admin/events`.
 
 QA: 43 uji RLS/Storage, 18 uji API guestlist, 3 uji Turnstile, 3 uji rate
-limit login, dan 195 uji browser (responsive + axe WCAG A/AA) semuanya lulus.
+limit login, dan 245 uji browser (responsive + axe WCAG A/AA) semuanya lulus.
 CSP nonce dan security headers sudah aktif. Lihat `docs/TESTING.md` untuk hasil
 lengkap dan sisa uji manual sebelum PHASE 6 (Deployment).
 

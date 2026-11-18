@@ -34,6 +34,7 @@ const PAGES = [
   { name: "home", path: "/" },
   { name: "privacy", path: "/privacy" },
   { name: "login", path: "/admin/login" },
+  { name: "not-found", path: "/this-page-does-not-exist", expect: 404 },
   ...(GUESTLIST_TOKEN
     ? [{ name: "guestlist", path: `/guestlist/${GUESTLIST_TOKEN}` }]
     : []),
@@ -62,9 +63,19 @@ async function auditPage(browser, target, viewport) {
   const pageErrors = [];
 
   page.on("console", (message) => {
-    if (message.type() === "error") {
-      consoleErrors.push(message.text());
+    if (message.type() !== "error") {
+      return;
     }
+
+    const text = message.text();
+
+    // A 404 page logs its own document response as a console error. That is
+    // the expected HTTP status, not a regression.
+    if (target.expect === 404 && /status of 404/i.test(text)) {
+      return;
+    }
+
+    consoleErrors.push(text);
   });
   page.on("pageerror", (error) => pageErrors.push(error.message));
 
@@ -82,9 +93,10 @@ async function auditPage(browser, target, viewport) {
     waitUntil: "networkidle",
   });
 
+  const expectedStatus = target.expect ?? 200;
   record(
-    `${label}: HTTP 200`,
-    response?.status() === 200,
+    `${label}: HTTP ${expectedStatus}`,
+    response?.status() === expectedStatus,
     `status ${response?.status() ?? "no response"}`,
   );
 

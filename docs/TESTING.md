@@ -17,7 +17,7 @@ pekerjaan. Tabel hasil mentah ada di `docs/qa-*.md`.
 | API guestlist: upload, spoofing, duplikat, rate limit | **18/18 PASS** | `docs/qa-api-results.md` |
 | Turnstile wajib saat secret diisi | **3/3 PASS** | `docs/qa-turnstile-results.md` |
 | Rate limit login admin | **3/3 PASS** | `docs/qa-login-results.md` |
-| Responsive, keyboard, reduced motion, axe WCAG A/AA | **195/195 PASS** | `docs/qa-browser-results.md` |
+| Responsive, keyboard, reduced motion, axe WCAG A/AA | **245/245 PASS** | `docs/qa-browser-results.md` |
 | CSP nonce + security headers | PASS (lihat §4) | diuji dengan curl + browser |
 | `npm audit --omit=dev` | **0 vulnerabilities** | output npm |
 | `npm audit` (termasuk dev) | 14 high, **dev-only** (§6) | output npm |
@@ -211,8 +211,8 @@ konfigurasi lint; ditunda ke PHASE 6 sambil memantau rilis
 
 ## 8. Responsive, keyboard, dan aksesibilitas
 
-195/195 PASS (`docs/qa-browser-results.md`), 5 halaman (home, privacy, login,
-form guestlist, termasuk mode mobile) × 5 viewport
+245/245 PASS (`docs/qa-browser-results.md`), 5 halaman (home, privacy, login,
+404, form guestlist, termasuk mode mobile) × 5 viewport
 (360, 390, 768, 1024, 1440):
 
 - Tidak ada horizontal overflow.
@@ -231,6 +231,16 @@ Bug yang ditemukan dan diperbaiki:
    `z.config({ jitless: true })`.
 3. **Uji RLS false positive** karena `DELETE` 204 tanpa baris terhapus.
    Diperbaiki di skrip, bukan di aplikasi.
+4. **Label-in-name (WCAG 2.5.3)** pada tombol RSVP: `aria-label` menyisipkan
+   nama event di tengah sehingga teks terlihat tidak lagi terkandung dalam
+   nama aksesibel. Diubah menjadi `RSVP via WhatsApp for <event>`.
+5. **Kontras 404 dekoratif**: angka "404" besar memakai warna `text-line` dan
+   dilaporkan axe meski `aria-hidden`. Dipindah ke pseudo-element
+   (`before:content-['404']`), sehingga tetap dekoratif tanpa menjadi teks
+   yang harus memenuhi kontras.
+6. **Console noise halaman 404**: browser mencatat respons dokumen 404 sebagai
+   error console. Skrip QA sekarang mengabaikan pesan itu hanya saat
+   `expect === 404`; error lain tetap menggagalkan uji.
 
 ### Yang masih manual
 
@@ -255,6 +265,8 @@ src/lib/rate-limit.ts                 # kind "login" + login limiter
 src/app/admin/login/actions.ts        # rate limit sebelum signInWithPassword
 src/lib/validation/guestlist.ts       # zod jitless (CSP)
 src/components/public/site-footer.tsx # kontras label
+src/components/public/event-card.tsx  # label-in-name tombol RSVP
+src/app/not-found.tsx                 # 404 dekoratif via pseudo-element
 src/app/admin/(dashboard)/page.tsx    # kontras label
 src/app/layout.tsx, next.config.ts    # header keamanan
 supabase/migrations/20261118090000_login_rate_limit.sql

@@ -145,53 +145,103 @@
 | 143 | login @1440: reduced motion respected | PASS | scroll-behavior auto |
 | 144 | login @1440: no console/page errors | PASS |  |
 | 145 | login @1440: axe WCAG A/AA | PASS |  |
-| 146 | guestlist @360: HTTP 200 | PASS | status 200 |
-| 147 | guestlist @360: no horizontal overflow | PASS | scrollWidth 360 vs viewport 360 |
-| 148 | guestlist @360: exactly one h1 | PASS | 1 h1 element(s) |
-| 149 | guestlist @360: every image has an alt attribute | PASS | 0 without alt |
-| 150 | guestlist @360: every form control has a label | PASS | 0 unlabeled |
-| 151 | guestlist @360: no CSP violations | PASS |  |
-| 152 | guestlist @360: reduced motion respected | PASS | scroll-behavior auto |
-| 153 | guestlist @360: no console/page errors | PASS |  |
-| 154 | guestlist @360: first Tab reaches the skip link | PASS | A "Skip to content" |
-| 155 | guestlist @360: axe WCAG A/AA | PASS |  |
-| 156 | guestlist @390: HTTP 200 | PASS | status 200 |
-| 157 | guestlist @390: no horizontal overflow | PASS | scrollWidth 390 vs viewport 390 |
-| 158 | guestlist @390: exactly one h1 | PASS | 1 h1 element(s) |
-| 159 | guestlist @390: every image has an alt attribute | PASS | 0 without alt |
-| 160 | guestlist @390: every form control has a label | PASS | 0 unlabeled |
-| 161 | guestlist @390: no CSP violations | PASS |  |
-| 162 | guestlist @390: reduced motion respected | PASS | scroll-behavior auto |
-| 163 | guestlist @390: no console/page errors | PASS |  |
-| 164 | guestlist @390: first Tab reaches the skip link | PASS | A "Skip to content" |
-| 165 | guestlist @390: axe WCAG A/AA | PASS |  |
-| 166 | guestlist @768: HTTP 200 | PASS | status 200 |
-| 167 | guestlist @768: no horizontal overflow | PASS | scrollWidth 768 vs viewport 768 |
-| 168 | guestlist @768: exactly one h1 | PASS | 1 h1 element(s) |
-| 169 | guestlist @768: every image has an alt attribute | PASS | 0 without alt |
-| 170 | guestlist @768: every form control has a label | PASS | 0 unlabeled |
-| 171 | guestlist @768: no CSP violations | PASS |  |
-| 172 | guestlist @768: reduced motion respected | PASS | scroll-behavior auto |
-| 173 | guestlist @768: no console/page errors | PASS |  |
-| 174 | guestlist @768: first Tab reaches the skip link | PASS | A "Skip to content" |
-| 175 | guestlist @768: axe WCAG A/AA | PASS |  |
-| 176 | guestlist @1024: HTTP 200 | PASS | status 200 |
-| 177 | guestlist @1024: no horizontal overflow | PASS | scrollWidth 1024 vs viewport 1024 |
-| 178 | guestlist @1024: exactly one h1 | PASS | 1 h1 element(s) |
-| 179 | guestlist @1024: every image has an alt attribute | PASS | 0 without alt |
-| 180 | guestlist @1024: every form control has a label | PASS | 0 unlabeled |
-| 181 | guestlist @1024: no CSP violations | PASS |  |
-| 182 | guestlist @1024: reduced motion respected | PASS | scroll-behavior auto |
-| 183 | guestlist @1024: no console/page errors | PASS |  |
-| 184 | guestlist @1024: first Tab reaches the skip link | PASS | A "Skip to content" |
-| 185 | guestlist @1024: axe WCAG A/AA | PASS |  |
-| 186 | guestlist @1440: HTTP 200 | PASS | status 200 |
-| 187 | guestlist @1440: no horizontal overflow | PASS | scrollWidth 1440 vs viewport 1440 |
-| 188 | guestlist @1440: exactly one h1 | PASS | 1 h1 element(s) |
-| 189 | guestlist @1440: every image has an alt attribute | PASS | 0 without alt |
-| 190 | guestlist @1440: every form control has a label | PASS | 0 unlabeled |
-| 191 | guestlist @1440: no CSP violations | PASS |  |
-| 192 | guestlist @1440: reduced motion respected | PASS | scroll-behavior auto |
-| 193 | guestlist @1440: no console/page errors | PASS |  |
-| 194 | guestlist @1440: first Tab reaches the skip link | PASS | A "Skip to content" |
-| 195 | guestlist @1440: axe WCAG A/AA | PASS |  |
+| 146 | not-found @360: HTTP 404 | PASS | status 404 |
+| 147 | not-found @360: no horizontal overflow | PASS | scrollWidth 360 vs viewport 360 |
+| 148 | not-found @360: exactly one h1 | PASS | 1 h1 element(s) |
+| 149 | not-found @360: every image has an alt attribute | PASS | 0 without alt |
+| 150 | not-found @360: every form control has a label | PASS | 0 unlabeled |
+| 151 | not-found @360: no CSP violations | PASS |  |
+| 152 | not-found @360: reduced motion respected | PASS | scroll-behavior auto |
+| 153 | not-found @360: no console/page errors | PASS |  |
+| 154 | not-found @360: first Tab reaches the skip link | PASS | A "Skip to content" |
+| 155 | not-found @360: axe WCAG A/AA | PASS |  |
+| 156 | not-found @390: HTTP 404 | PASS | status 404 |
+| 157 | not-found @390: no horizontal overflow | PASS | scrollWidth 390 vs viewport 390 |
+| 158 | not-found @390: exactly one h1 | PASS | 1 h1 element(s) |
+| 159 | not-found @390: every image has an alt attribute | PASS | 0 without alt |
+| 160 | not-found @390: every form control has a label | PASS | 0 unlabeled |
+| 161 | not-found @390: no CSP violations | PASS |  |
+| 162 | not-found @390: reduced motion respected | PASS | scroll-behavior auto |
+| 163 | not-found @390: no console/page errors | PASS |  |
+| 164 | not-found @390: first Tab reaches the skip link | PASS | A "Skip to content" |
+| 165 | not-found @390: axe WCAG A/AA | PASS |  |
+| 166 | not-found @768: HTTP 404 | PASS | status 404 |
+| 167 | not-found @768: no horizontal overflow | PASS | scrollWidth 768 vs viewport 768 |
+| 168 | not-found @768: exactly one h1 | PASS | 1 h1 element(s) |
+| 169 | not-found @768: every image has an alt attribute | PASS | 0 without alt |
+| 170 | not-found @768: every form control has a label | PASS | 0 unlabeled |
+| 171 | not-found @768: no CSP violations | PASS |  |
+| 172 | not-found @768: reduced motion respected | PASS | scroll-behavior auto |
+| 173 | not-found @768: no console/page errors | PASS |  |
+| 174 | not-found @768: first Tab reaches the skip link | PASS | A "Skip to content" |
+| 175 | not-found @768: axe WCAG A/AA | PASS |  |
+| 176 | not-found @1024: HTTP 404 | PASS | status 404 |
+| 177 | not-found @1024: no horizontal overflow | PASS | scrollWidth 1024 vs viewport 1024 |
+| 178 | not-found @1024: exactly one h1 | PASS | 1 h1 element(s) |
+| 179 | not-found @1024: every image has an alt attribute | PASS | 0 without alt |
+| 180 | not-found @1024: every form control has a label | PASS | 0 unlabeled |
+| 181 | not-found @1024: no CSP violations | PASS |  |
+| 182 | not-found @1024: reduced motion respected | PASS | scroll-behavior auto |
+| 183 | not-found @1024: no console/page errors | PASS |  |
+| 184 | not-found @1024: first Tab reaches the skip link | PASS | A "Skip to content" |
+| 185 | not-found @1024: axe WCAG A/AA | PASS |  |
+| 186 | not-found @1440: HTTP 404 | PASS | status 404 |
+| 187 | not-found @1440: no horizontal overflow | PASS | scrollWidth 1440 vs viewport 1440 |
+| 188 | not-found @1440: exactly one h1 | PASS | 1 h1 element(s) |
+| 189 | not-found @1440: every image has an alt attribute | PASS | 0 without alt |
+| 190 | not-found @1440: every form control has a label | PASS | 0 unlabeled |
+| 191 | not-found @1440: no CSP violations | PASS |  |
+| 192 | not-found @1440: reduced motion respected | PASS | scroll-behavior auto |
+| 193 | not-found @1440: no console/page errors | PASS |  |
+| 194 | not-found @1440: first Tab reaches the skip link | PASS | A "Skip to content" |
+| 195 | not-found @1440: axe WCAG A/AA | PASS |  |
+| 196 | guestlist @360: HTTP 200 | PASS | status 200 |
+| 197 | guestlist @360: no horizontal overflow | PASS | scrollWidth 360 vs viewport 360 |
+| 198 | guestlist @360: exactly one h1 | PASS | 1 h1 element(s) |
+| 199 | guestlist @360: every image has an alt attribute | PASS | 0 without alt |
+| 200 | guestlist @360: every form control has a label | PASS | 0 unlabeled |
+| 201 | guestlist @360: no CSP violations | PASS |  |
+| 202 | guestlist @360: reduced motion respected | PASS | scroll-behavior auto |
+| 203 | guestlist @360: no console/page errors | PASS |  |
+| 204 | guestlist @360: first Tab reaches the skip link | PASS | A "Skip to content" |
+| 205 | guestlist @360: axe WCAG A/AA | PASS |  |
+| 206 | guestlist @390: HTTP 200 | PASS | status 200 |
+| 207 | guestlist @390: no horizontal overflow | PASS | scrollWidth 390 vs viewport 390 |
+| 208 | guestlist @390: exactly one h1 | PASS | 1 h1 element(s) |
+| 209 | guestlist @390: every image has an alt attribute | PASS | 0 without alt |
+| 210 | guestlist @390: every form control has a label | PASS | 0 unlabeled |
+| 211 | guestlist @390: no CSP violations | PASS |  |
+| 212 | guestlist @390: reduced motion respected | PASS | scroll-behavior auto |
+| 213 | guestlist @390: no console/page errors | PASS |  |
+| 214 | guestlist @390: first Tab reaches the skip link | PASS | A "Skip to content" |
+| 215 | guestlist @390: axe WCAG A/AA | PASS |  |
+| 216 | guestlist @768: HTTP 200 | PASS | status 200 |
+| 217 | guestlist @768: no horizontal overflow | PASS | scrollWidth 768 vs viewport 768 |
+| 218 | guestlist @768: exactly one h1 | PASS | 1 h1 element(s) |
+| 219 | guestlist @768: every image has an alt attribute | PASS | 0 without alt |
+| 220 | guestlist @768: every form control has a label | PASS | 0 unlabeled |
+| 221 | guestlist @768: no CSP violations | PASS |  |
+| 222 | guestlist @768: reduced motion respected | PASS | scroll-behavior auto |
+| 223 | guestlist @768: no console/page errors | PASS |  |
+| 224 | guestlist @768: first Tab reaches the skip link | PASS | A "Skip to content" |
+| 225 | guestlist @768: axe WCAG A/AA | PASS |  |
+| 226 | guestlist @1024: HTTP 200 | PASS | status 200 |
+| 227 | guestlist @1024: no horizontal overflow | PASS | scrollWidth 1024 vs viewport 1024 |
+| 228 | guestlist @1024: exactly one h1 | PASS | 1 h1 element(s) |
+| 229 | guestlist @1024: every image has an alt attribute | PASS | 0 without alt |
+| 230 | guestlist @1024: every form control has a label | PASS | 0 unlabeled |
+| 231 | guestlist @1024: no CSP violations | PASS |  |
+| 232 | guestlist @1024: reduced motion respected | PASS | scroll-behavior auto |
+| 233 | guestlist @1024: no console/page errors | PASS |  |
+| 234 | guestlist @1024: first Tab reaches the skip link | PASS | A "Skip to content" |
+| 235 | guestlist @1024: axe WCAG A/AA | PASS |  |
+| 236 | guestlist @1440: HTTP 200 | PASS | status 200 |
+| 237 | guestlist @1440: no horizontal overflow | PASS | scrollWidth 1440 vs viewport 1440 |
+| 238 | guestlist @1440: exactly one h1 | PASS | 1 h1 element(s) |
+| 239 | guestlist @1440: every image has an alt attribute | PASS | 0 without alt |
+| 240 | guestlist @1440: every form control has a label | PASS | 0 unlabeled |
+| 241 | guestlist @1440: no CSP violations | PASS |  |
+| 242 | guestlist @1440: reduced motion respected | PASS | scroll-behavior auto |
+| 243 | guestlist @1440: no console/page errors | PASS |  |
+| 244 | guestlist @1440: first Tab reaches the skip link | PASS | A "Skip to content" |
+| 245 | guestlist @1440: axe WCAG A/AA | PASS |  |

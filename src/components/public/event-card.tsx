@@ -105,7 +105,7 @@ export function EventCard({ event }: { event: PublicEvent }) {
               target="_blank"
               rel="noopener noreferrer"
               size="md"
-              aria-label={`RSVP for ${event.name} via WhatsApp`}
+              aria-label={`RSVP via WhatsApp for ${event.name}`}
             >
               RSVP via WhatsApp
             </ButtonLink>

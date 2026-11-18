@@ -14,12 +14,12 @@ export default function NotFound() {
             Error 404
           </p>
 
-          <p
+          {/* Decorative: drawn with a pseudo-element so the low-contrast
+              outline is not exposed as text to assistive tech or axe. */}
+          <div
             aria-hidden="true"
-            className="mt-4 font-display text-display-xl uppercase leading-[0.8] text-line"
-          >
-            404
-          </p>
+            className="mt-4 select-none font-display text-display-xl uppercase leading-[0.8] text-line before:content-['404']"
+          />
 
           <h1 className="mt-6 font-display text-h1 uppercase">
             This page is off the map.
