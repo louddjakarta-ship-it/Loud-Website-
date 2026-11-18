@@ -9,7 +9,8 @@ export const publicEnv = {
   supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL ?? "",
   supabasePublishableKey:
     process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ?? "",
-  siteUrl: process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",
+  siteUrl:
+    process.env.NEXT_PUBLIC_SITE_URL?.trim() || "http://localhost:3000",
   defaultWhatsappNumber:
     process.env.NEXT_PUBLIC_DEFAULT_WHATSAPP_NUMBER ?? "",
   instagramUrl: process.env.NEXT_PUBLIC_INSTAGRAM_URL ?? "",

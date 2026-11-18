@@ -46,8 +46,8 @@ Terakhir diperbarui: 18 November 2026.
 - **Status:** selesai. Remote `origin` →
   `https://github.com/louddjakarta-ship-it/Loud-Website-`, branch `main`
   sudah di-push dan tracking `origin/main`.
-- **Sisa:** pasang branch protection minimal (butuh akses GitHub owner), lalu
-  tambahkan CI bila diinginkan (`docs/DEPLOYMENT.md` §9).
+- **Sisa:** pasang branch protection minimal dan jadikan CI
+  (`.github/workflows/ci.yml`) required check (butuh akses GitHub owner).
 - **Jangan:** commit `.env.local`, secret key, token guestlist asli.
 - **Verifikasi:** `git remote -v` dan `git ls-remote --heads origin`.
 

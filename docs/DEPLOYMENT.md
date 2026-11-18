@@ -233,39 +233,25 @@ mengekspos script ini sebagai endpoint publik.
 
 ---
 
-## 9. CI opsional (GitHub Actions)
+## 9. CI (GitHub Actions)
 
-Workflow minimal yang disarankan:
+Workflow sudah ada di `.github/workflows/ci.yml` dan berjalan pada setiap push
+ke `main` serta pull request:
 
-```yaml
-name: ci
-on:
-  pull_request:
-  push:
-    branches: [main]
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: npm
-      - run: npm ci
-      - run: npm run lint
-      - run: npm run typecheck
-      - run: npm run build
-        env:
-          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-          NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY }}
-          NEXT_PUBLIC_SITE_URL: https://example.com
-```
+- `npm ci`
+- `npm run lint`
+- `npm run typecheck`
+- `npm run build`
 
-Sediakan env public saat build agar metadata dan sitemap tidak memakai
-`localhost`. Build **tidak** membutuhkan `SUPABASE_SECRET_KEY`: halaman
-dirender dinamis, jadi query database baru berjalan saat request. Jangan
-menambahkan secret server ke CI build.
+Workflow hanya memakai `NEXT_PUBLIC_SITE_URL` placeholder. Build tidak
+membutuhkan Supabase public/secret key karena halaman dirender dinamis; query
+database baru berjalan saat request.
+
+Aktifkan sebagai required check di GitHub → Settings → Branches → `main` →
+**Require status checks to pass** → pilih **Lint, typecheck, build**.
+
+Jangan menambahkan `SUPABASE_SECRET_KEY` ke CI build: build tidak
+membutuhkannya, dan secret server tidak boleh dipakai untuk prerender.
 
 ---
 
