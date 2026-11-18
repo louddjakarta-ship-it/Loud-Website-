@@ -3,10 +3,13 @@
 Website event organizer LOUD JAKARTA: upcoming events, RSVP WhatsApp, gallery
 foto, dan guestlist privat lewat link yang dibagikan admin.
 
-Status: **PHASE 5 — Security & QA selesai untuk lapisan otomatis**. Public
-website (homepage, RSVP WhatsApp, gallery) dan admin dashboard (login, event
-management, gallery, homepage copy, guestlist link, review guestlist, CSV
-export) sudah terhubung ke Supabase.
+Status: **PHASE 5 — Security & QA selesai; PHASE 6 — Deployment siap
+dijalankan.** Public website (homepage, RSVP WhatsApp, gallery) dan admin
+dashboard (login, event management, gallery, homepage copy, guestlist link,
+review guestlist, CSV export) sudah terhubung ke Supabase. Deployment ke Vercel
+belum dilakukan karena menunggu repo GitHub dan domain final dari owner;
+panduan lengkapnya sudah tersedia di `docs/DEPLOYMENT.md` dan
+`docs/CUSTOM_DOMAIN.md`.
 Guestlist bersifat **link-only**: pengunjung hanya melihat upcoming events,
 sedangkan form guestlist hanya terbuka lewat `/guestlist/<token>` yang
 di-copy admin dari `/admin/events`.
@@ -14,7 +17,8 @@ di-copy admin dari `/admin/events`.
 QA: 43 uji RLS/Storage, 18 uji API guestlist, 3 uji Turnstile, 3 uji rate
 limit login, dan 245 uji browser (responsive + axe WCAG A/AA) semuanya lulus.
 CSP nonce dan security headers sudah aktif. Lihat `docs/TESTING.md` untuk hasil
-lengkap dan sisa uji manual sebelum PHASE 6 (Deployment).
+lengkap dan sisa uji manual. Item yang masih butuh data owner ada di
+`docs/CONFIGURATION_TODO.md`.
 
 ## Stack
 
@@ -189,6 +193,10 @@ docs/
 ├── PHASE-3-PUBLIC.md
 ├── PHASE-4-ADMIN.md
 ├── TESTING.md           # hasil QA + sisa uji manual
+├── DEPLOYMENT.md        # deploy Vercel + smoke test
+├── CUSTOM_DOMAIN.md     # domain, DNS, HTTPS
+├── ADMIN_SETUP.md       # buat/kelola akun admin
+├── CONFIGURATION_TODO.md# data owner yang masih placeholder
 ├── qa-*-results.md      # tabel hasil QA mentah
 └── SUPABASE_SETUP.md
 ```
@@ -243,4 +251,8 @@ Panduan operasional ada di `docs/PHASE-4-ADMIN.md`.
 - `docs/PHASE-3-PUBLIC.md` — hasil public website + verifikasi
 - `docs/PHASE-4-ADMIN.md` — hasil admin dashboard, izin, audit, verifikasi
 - `docs/TESTING.md` — checklist dan hasil Security & QA (PHASE 5)
+- `docs/DEPLOYMENT.md` — langkah deploy ke Vercel + smoke test (PHASE 6)
+- `docs/CUSTOM_DOMAIN.md` — domain, DNS, HTTPS, Supabase Auth URL
+- `docs/ADMIN_SETUP.md` — membuat dan mencabut akun admin
+- `docs/CONFIGURATION_TODO.md` — data/konfigurasi yang masih menunggu owner
 - `docs/SUPABASE_SETUP.md` — kredensial, migration, admin pertama

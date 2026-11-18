@@ -78,6 +78,7 @@ Jalankan migration sesuai urutan:
 6. `supabase/migrations/20261117110000_event_maps_url.sql`
 7. `supabase/migrations/20261117113000_site_settings.sql`
 8. `supabase/migrations/20261117115000_gallery_photos.sql`
+9. `supabase/migrations/20261118090000_login_rate_limit.sql`
 
 Untuk setiap file: **SQL Editor → New query → paste → Run**. Pastikan tidak ada
 error sebelum lanjut ke file berikutnya.
@@ -102,6 +103,7 @@ Migration ini membuat:
 - tabel `gallery_photos` + bucket publik `gallery-photos` (5 MB,
   jpeg/png/webp) untuk gallery homepage; hanya admin yang bisa insert/delete
   foto maupun object Storage
+- kind `login` pada `submission_attempts` untuk rate limit login admin
 
 **Cara B — Supabase CLI**
 
