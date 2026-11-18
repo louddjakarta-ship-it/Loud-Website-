@@ -8,6 +8,11 @@
     "start": "next start",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
+    "qa:rls": "node --env-file=.env.local scripts/qa-rls.mjs",
+    "qa:api": "node --env-file=.env.local scripts/qa-api.mjs",
+    "qa:browser": "node scripts/qa-browser.mjs",
+    "qa:turnstile": "node --env-file=.env.local scripts/qa-turnstile.mjs",
+    "qa:login": "node --env-file=.env.local scripts/qa-login.mjs",
     "cleanup:orphans": "node --env-file=.env.local scripts/cleanup-orphans.mjs"
   },
   "dependencies": {
@@ -23,8 +28,10 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "axe-core": "^4.14.1",
     "eslint": "^9",
     "eslint-config-next": "16.4.6",
+    "playwright-core": "^1.65.1",
     "tailwindcss": "4.3.3",
     "typescript": "^5"
   }

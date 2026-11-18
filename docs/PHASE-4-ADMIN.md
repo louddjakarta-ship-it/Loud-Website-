@@ -247,8 +247,8 @@ tambahan punya migration sendiri: `20261117113000_site_settings.sql` dan
 | Uji review dengan bukti asli | Perlu event asli + submission asli |
 | Notifikasi WhatsApp | Sengaja tidak diimplementasikan (sesuai brief) |
 | UI manajemen staff | Belum ada; staff ditambahkan lewat SQL/Supabase |
-| CSP nonce | Dijadwalkan PHASE 5 |
-| Rate limit login | Belum ada; pertimbangkan di PHASE 5 |
+| Rate limit login | ✅ Selesai di PHASE 5 (10 percobaan / 15 menit per IP + email) |
+| CSP nonce | ✅ Selesai di PHASE 5 (lihat `docs/TESTING.md`) |
 | Preview bukti inline | Saat ini membuka signed URL di tab baru |
 
 ---

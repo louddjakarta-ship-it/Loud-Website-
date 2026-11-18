@@ -5,7 +5,7 @@ import { createHash } from "node:crypto";
 import { getRateLimitSalt } from "@/lib/env/server";
 import { createAdminSupabaseClient } from "@/lib/supabase/admin";
 
-export type RateLimitKind = "upload" | "submit";
+export type RateLimitKind = "upload" | "submit" | "login";
 
 type RateLimitRule = {
   windowMs: number;
@@ -18,23 +18,25 @@ const RULES: Record<RateLimitKind, RateLimitRule> = {
   // Final submissions are stricter. Failed attempts count too, which is
   // intentional: it stops repeated guessing and proof re-upload loops.
   submit: { windowMs: 60 * 60 * 1000, limit: 5 },
+  // Admin sign-in: 10 attempts per 15 minutes per IP + email pair.
+  login: { windowMs: 15 * 60 * 1000, limit: 10 },
 };
 
 const ATTEMPT_RETENTION_MS = 24 * 60 * 60 * 1000;
 
-function getClientIp(request: Request): string {
-  const forwarded = request.headers.get("x-forwarded-for");
+function getClientIp(headers: Headers): string {
+  const forwarded = headers.get("x-forwarded-for");
 
   if (forwarded) {
     return forwarded.split(",")[0]?.trim() || "unknown";
   }
 
-  return request.headers.get("x-real-ip")?.trim() || "unknown";
+  return headers.get("x-real-ip")?.trim() || "unknown";
 }
 
-function hashClientIp(ip: string): string {
+function hashValue(value: string): string {
   return createHash("sha256")
-    .update(`${ip}:${getRateLimitSalt()}`)
+    .update(`${value}:${getRateLimitSalt()}`)
     .digest("hex");
 }
 
@@ -61,23 +63,24 @@ export type RateLimitResult =
   | { ok: true }
   | { ok: false; retryAfterSeconds: number };
 
+type RecordAttemptInput = {
+  kind: RateLimitKind;
+  key: string;
+  eventId: string | null;
+};
+
 /**
- * Counts recent attempts for this IP hash, then records a new attempt.
- * Raw IP addresses are never stored.
+ * Counts recent attempts for this hashed key, then records a new attempt.
+ * Raw IP addresses (and admin emails) are never stored.
  *
  * Throws when the ledger is unavailable; callers should fail closed with a
- * generic 503 instead of allowing unlimited submissions.
+ * generic 503 instead of allowing unlimited attempts.
  */
-export async function enforceRateLimit({
-  request,
+async function checkAndRecord({
   kind,
+  key,
   eventId,
-}: {
-  request: Request;
-  kind: RateLimitKind;
-  eventId: string;
-}): Promise<RateLimitResult> {
-  const ipHash = hashClientIp(getClientIp(request));
+}: RecordAttemptInput): Promise<RateLimitResult> {
   const rule = RULES[kind];
   const since = new Date(Date.now() - rule.windowMs).toISOString();
   const admin = createAdminSupabaseClient();
@@ -85,7 +88,7 @@ export async function enforceRateLimit({
   const { count, error } = await admin
     .from("submission_attempts")
     .select("id", { count: "exact", head: true })
-    .eq("ip_hash", ipHash)
+    .eq("ip_hash", key)
     .eq("kind", kind)
     .gte("created_at", since);
 
@@ -97,7 +100,7 @@ export async function enforceRateLimit({
     const { data: oldest } = await admin
       .from("submission_attempts")
       .select("created_at")
-      .eq("ip_hash", ipHash)
+      .eq("ip_hash", key)
       .eq("kind", kind)
       .gte("created_at", since)
       .order("created_at", { ascending: true })
@@ -117,7 +120,7 @@ export async function enforceRateLimit({
 
   const { error: insertError } = await admin
     .from("submission_attempts")
-    .insert({ ip_hash: ipHash, event_id: eventId, kind });
+    .insert({ ip_hash: key, event_id: eventId, kind });
 
   if (insertError) {
     throw new Error("rate_limit_unavailable");
@@ -126,4 +129,36 @@ export async function enforceRateLimit({
   maybeCleanupOldAttempts();
 
   return { ok: true };
+}
+
+export async function enforceRateLimit({
+  request,
+  kind,
+  eventId,
+}: {
+  request: Request;
+  kind: Exclude<RateLimitKind, "login">;
+  eventId: string;
+}): Promise<RateLimitResult> {
+  const key = hashValue(getClientIp(request.headers));
+
+  return checkAndRecord({ kind, key, eventId });
+}
+
+/**
+ * Admin sign-in limiter. The key combines IP and email so one noisy IP cannot
+ * lock every admin out, and one email cannot be brute-forced from many IPs.
+ */
+export async function enforceLoginRateLimit({
+  headers,
+  email,
+}: {
+  headers: Headers;
+  email: string;
+}): Promise<RateLimitResult> {
+  const key = hashValue(
+    `login:${getClientIp(headers)}:${email.trim().toLowerCase()}`,
+  );
+
+  return checkAndRecord({ kind: "login", key, eventId: null });
 }

@@ -265,7 +265,7 @@ export default async function AdminDashboardPage() {
                 Export guestlist CSV
               </a>
             ) : (
-              <span className="py-4 font-mono text-micro uppercase tracking-[0.12em] text-muted/60">
+              <span className="py-4 font-mono text-micro uppercase tracking-[0.12em] text-muted">
                 CSV export is super admin only
               </span>
             )}

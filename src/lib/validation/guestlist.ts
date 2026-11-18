@@ -1,5 +1,10 @@
 import { z } from "zod";
 
+// Strict CSP has no 'unsafe-eval'. Zod's JIT probe calls Function("") during
+// validation, which browsers report as a CSP violation even though it is
+// caught internally. Disabling the JIT keeps the policy clean.
+z.config({ jitless: true });
+
 export const PROOF_MIME_TYPES = [
   "image/jpeg",
   "image/png",

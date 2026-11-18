@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Anton, Inter } from "next/font/google";
+import { connection } from "next/server";
 import type { ReactNode } from "react";
 
 import { publicEnv } from "@/lib/env/public";
@@ -53,7 +54,15 @@ export const viewport: Viewport = {
   colorScheme: "dark",
 };
 
-export default function RootLayout({ children }: { children: ReactNode }) {
+export default async function RootLayout({
+  children,
+}: {
+  children: ReactNode;
+}) {
+  // Required for the nonce-based CSP: Next.js can only apply a per-request
+  // nonce to dynamically rendered pages.
+  await connection();
+
   return (
     <html
       lang="en"

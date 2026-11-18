@@ -3,14 +3,18 @@
 Website event organizer LOUD JAKARTA: upcoming events, RSVP WhatsApp, gallery
 foto, dan guestlist privat lewat link yang dibagikan admin.
 
-Status: **PHASE 4 — Admin dashboard selesai di lokal**. Public website
-(homepage, RSVP WhatsApp, gallery) dan admin dashboard (login, event
+Status: **PHASE 5 — Security & QA selesai untuk lapisan otomatis**. Public
+website (homepage, RSVP WhatsApp, gallery) dan admin dashboard (login, event
 management, gallery, homepage copy, guestlist link, review guestlist, CSV
 export) sudah terhubung ke Supabase.
 Guestlist bersifat **link-only**: pengunjung hanya melihat upcoming events,
 sedangkan form guestlist hanya terbuka lewat `/guestlist/<token>` yang
-di-copy admin dari `/admin/events`. Lihat `docs/PHASE-4-ADMIN.md` untuk hasil
-verifikasi dan sisa pekerjaan menuju PHASE 5 (Security & QA).
+di-copy admin dari `/admin/events`.
+
+QA: 43 uji RLS/Storage, 18 uji API guestlist, 3 uji Turnstile, 3 uji rate
+limit login, dan 195 uji browser (responsive + axe WCAG A/AA) semuanya lulus.
+CSP nonce dan security headers sudah aktif. Lihat `docs/TESTING.md` untuk hasil
+lengkap dan sisa uji manual sebelum PHASE 6 (Deployment).
 
 ## Stack
 
@@ -129,6 +133,11 @@ membaca; perubahan langsung tampil setelah disimpan.
 | `npm run start` | Jalankan hasil build |
 | `npm run lint` | ESLint |
 | `npm run typecheck` | TypeScript tanpa emit |
+| `npm run qa:rls` | Matriks RLS + Storage (butuh secret key) |
+| `npm run qa:api` | Uji upload/duplikat/rate limit API guestlist |
+| `npm run qa:browser` | Responsive + CSP + axe WCAG (butuh server jalan) |
+| `npm run qa:turnstile` | Uji token Turnstile wajib (server terpisah) |
+| `npm run qa:login` | Uji rate limit login admin |
 | `npm run cleanup:orphans -- --dry-run` | Lihat file bukti orphan (>24 jam) |
 | `npm run cleanup:orphans` | Hapus file bukti orphan |
 
@@ -152,12 +161,13 @@ src/
 ├── lib/
 │   ├── admin/           # guestlist filter parsing, action state
 │   ├── auth/            # session guard + role checks
-│   ├── data/            # public event queries
+│   ├── data/            # public event/gallery/site-settings queries
 │   ├── env/             # validasi env public vs server-only
 │   ├── images/          # kompresi bukti/flyer + magic bytes
+│   ├── security/        # CSP nonce builder
 │   ├── storage/         # path, signed upload, verifikasi bukti
 │   ├── supabase/        # browser, server, admin, proxy clients
-│   ├── validation/      # Zod schema guestlist + event
+│   ├── validation/      # Zod schema guestlist/event/gallery/settings
 │   ├── api.ts
 │   ├── format.ts
 │   ├── rate-limit.ts
@@ -166,16 +176,20 @@ src/
 ├── styles/globals.css   # Tailwind + design tokens
 └── proxy.ts             # Next.js 16 Proxy (pengganti middleware)
 supabase/
-├── migrations/          # schema + hardening + rate-limit kind
+├── migrations/          # schema + hardening + fitur per phase
 ├── seed.sql             # satu event placeholder (unpublished)
 └── seed-demo.sql        # 5 event dummy published (khusus preview lokal)
 scripts/
-└── cleanup-orphans.mjs  # hapus bukti yang tidak direferensikan
+├── cleanup-orphans.mjs  # hapus bukti yang tidak direferensikan
+└── qa-*.mjs             # skrip QA PHASE 5 (RLS, API, browser, login, Turnstile)
+preview/                 # screenshot UI untuk dokumentasi
 docs/
 ├── PHASE-1-PLANNING.md
 ├── PHASE-2-SETUP.md
 ├── PHASE-3-PUBLIC.md
 ├── PHASE-4-ADMIN.md
+├── TESTING.md           # hasil QA + sisa uji manual
+├── qa-*-results.md      # tabel hasil QA mentah
 └── SUPABASE_SETUP.md
 ```
 
@@ -211,8 +225,13 @@ Panduan operasional ada di `docs/PHASE-4-ADMIN.md`.
   bisa submit lewat route handler yang memvalidasi field, file, duplikat, dan
   rate limit.
 - Bukti diverifikasi ulang lewat magic bytes setelah upload; path dibuat server.
-- Security headers dasar sudah aktif di `next.config.ts`; CSP nonce menyusul
-  di PHASE 5.
+- Security headers + **CSP nonce** aktif (`src/proxy.ts`,
+  `src/lib/security/csp.ts`). Semua halaman dirender dinamis agar nonce bisa
+  diterapkan; tidak ada `unsafe-inline` untuk script.
+- Login admin dibatasi 10 percobaan / 15 menit per kombinasi IP + email
+  (`submission_attempts.kind = 'login'`, hanya hash yang disimpan).
+- Guestlist dibatasi 10 signed URL / 10 menit dan 5 submission / jam per IP
+  hash; Turnstile wajib bila secret diisi.
 - Jangan commit `.env.local` dan jangan pernah menaruh secret di
   `NEXT_PUBLIC_*`.
 
@@ -223,4 +242,5 @@ Panduan operasional ada di `docs/PHASE-4-ADMIN.md`.
 - `docs/PHASE-2-SETUP.md` — setup Next.js, Tailwind, Supabase client
 - `docs/PHASE-3-PUBLIC.md` — hasil public website + verifikasi
 - `docs/PHASE-4-ADMIN.md` — hasil admin dashboard, izin, audit, verifikasi
+- `docs/TESTING.md` — checklist dan hasil Security & QA (PHASE 5)
 - `docs/SUPABASE_SETUP.md` — kredensial, migration, admin pertama

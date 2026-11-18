@@ -1,10 +1,12 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { headers } from "next/headers";
 import { z } from "zod";
 
 import { zodFieldErrors } from "@/lib/api";
 import type { LoginState } from "@/lib/auth/login-state";
+import { enforceLoginRateLimit } from "@/lib/rate-limit";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 
 const loginSchema = z.object({
@@ -44,6 +46,27 @@ export async function signInAction(
   }
 
   const supabase = await createServerSupabaseClient();
+
+  try {
+    const limit = await enforceLoginRateLimit({
+      headers: await headers(),
+      email: parsed.data.email,
+    });
+
+    if (!limit.ok) {
+      return {
+        status: "error",
+        message:
+          "Too many sign-in attempts. Wait a few minutes before trying again.",
+      };
+    }
+  } catch {
+    return {
+      status: "error",
+      message: "Sign-in is temporarily unavailable. Please try again later.",
+    };
+  }
+
   const { data, error } = await supabase.auth.signInWithPassword({
     email: parsed.data.email,
     password: parsed.data.password,

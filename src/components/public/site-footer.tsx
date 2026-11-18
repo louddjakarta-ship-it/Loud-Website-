@@ -27,7 +27,7 @@ export function SiteFooter() {
           aria-label="Footer"
           className="flex flex-col gap-3 font-mono text-micro uppercase tracking-[0.12em] lg:col-span-3"
         >
-          <span className="text-muted/60">Explore</span>
+          <span className="text-muted">Explore</span>
           <Link href="/#events" className="text-paper hover:text-accent">
             Upcoming events
           </Link>
@@ -40,7 +40,7 @@ export function SiteFooter() {
         </nav>
 
         <div className="flex flex-col gap-3 font-mono text-micro uppercase tracking-[0.12em] lg:col-span-4">
-          <span className="text-muted/60">Contact</span>
+          <span className="text-muted">Contact</span>
 
           {instagramUrl ? (
             <a

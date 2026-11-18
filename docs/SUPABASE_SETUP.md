@@ -59,7 +59,10 @@ Karena admin dibuat manual (tidak ada self-signup):
 2. **Authentication → Settings**
    - Biarkan email confirmation sesuai kebutuhan. Saat membuat admin manual
      dari dashboard, centang **Auto Confirm User**.
-3. Tidak ada endpoint publik untuk membuat akun admin.
+3. **Authentication → Password security**
+   - Aktifkan **Prevent use of leaked passwords** (cek HaveIBeenPwned).
+     Supabase advisor menandai ini sampai diaktifkan; wajib sebelum production.
+4. Tidak ada endpoint publik untuk membuat akun admin.
 
 ## 4. Jalankan migration
 
