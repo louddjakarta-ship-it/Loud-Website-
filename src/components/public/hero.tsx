@@ -73,13 +73,9 @@ export function Hero({
               <dt className="text-muted">Sound</dt>
               <dd className="text-right">Electronic / Nightlife</dd>
             </div>
-            <div className="flex items-baseline justify-between gap-4 border-b border-line py-3">
+            <div className="flex items-baseline justify-between gap-4 py-3">
               <dt className="text-muted">Est.</dt>
               <dd>2026</dd>
-            </div>
-            <div className="flex items-baseline justify-between gap-4 py-3">
-              <dt className="text-muted">Access</dt>
-              <dd className="text-accent">Guestlist only</dd>
             </div>
           </dl>
 
