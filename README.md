@@ -77,6 +77,7 @@ Buka http://localhost:3000.
 | `RATE_LIMIT_SALT` | **Server-only** | Ya | Salt hash IP untuk rate limit |
 | `TURNSTILE_SECRET_KEY` | **Server-only** | Tidak | Wajib jika site key diisi |
 | `GUESTLIST_MAX_FILE_MB` | **Server-only** | Tidak | Default `5` |
+| `CRON_SECRET` | **Server-only** | Tidak | Bearer token untuk `/api/cron/cleanup-orphans`; minimal 16 karakter |
 
 Aturan: variabel server-only **tidak boleh** diberi prefix `NEXT_PUBLIC_` dan
 tidak boleh di-import dari Client Component. Semua akses secret melewati
@@ -145,6 +146,10 @@ membaca; perubahan langsung tampil setelah disimpan.
 | `npm run cleanup:orphans -- --dry-run` | Lihat file bukti orphan (>24 jam) |
 | `npm run cleanup:orphans` | Hapus file bukti orphan |
 
+Cleanup juga berjalan otomatis lewat Vercel Schedules setiap hari pukul
+03:00 WIB (`vercel.json` → `/api/cron/cleanup-orphans`, butuh `CRON_SECRET`).
+Detail di `docs/DEPLOYMENT.md` §8.
+
 ## Struktur singkat
 
 ```text
@@ -153,6 +158,7 @@ src/
 │   ├── (site)/          # homepage, guestlist privat, privacy (public layout)
 │   ├── admin/           # login, dashboard, events, gallery, guestlist, actions
 │   ├── api/
+│   │   ├── cron/        # scheduled orphan-proof cleanup
 │   │   ├── guestlist/   # signed upload URL + final submission
 │   │   └── admin/       # CSV export + signed proof URL
 │   ├── not-found.tsx

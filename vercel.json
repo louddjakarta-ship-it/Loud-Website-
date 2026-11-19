@@ -1,0 +1,11 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "schedules": {
+    "cleanup-orphan-proofs": {
+      "schedule": "0 3 * * *",
+      "timezone": "Asia/Jakarta",
+      "path": "/api/cron/cleanup-orphans",
+      "requestMethod": "GET"
+    }
+  }
+}

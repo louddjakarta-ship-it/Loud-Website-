@@ -149,6 +149,7 @@ Catatan Next.js 16 di Vercel:
 | `RATE_LIMIT_SALT` | **Server-only** | Wajib | Wajib | **Nilai berbeda** dari lokal |
 | `TURNSTILE_SECRET_KEY` | **Server-only** | Opsional | Opsional | Wajib jika site key diisi |
 | `GUESTLIST_MAX_FILE_MB` | **Server-only** | Opsional | Opsional | Default `5` |
+| `CRON_SECRET` | **Server-only** | Wajib | Opsional | Bearer token untuk route cleanup terjadwal; minimal 16 karakter |
 
 Aturan penting:
 
@@ -230,10 +231,34 @@ QA tertinggal.
 
 ### Cleanup bukti orphan
 
-`npm run cleanup:orphans` membutuhkan `SUPABASE_SECRET_KEY`. Saat ini belum ada
-endpoint cron terproteksi, jadi jalankan dari mesin yang punya `.env.local`
-production, atau tambahkan route cron terproteksi di phase berikutnya. Jangan
-mengekspos script ini sebagai endpoint publik.
+Bukti guestlist diunggah sebelum baris `guestlist` dibuat. Jika submission
+gagal di tengah jalan, object-nya tertinggal tanpa referensi. Dua cara
+membersihkannya:
+
+1. **Terjadwal (production).** `vercel.json` mendeklarasikan schedule
+   `cleanup-orphan-proofs` yang memanggil `GET /api/cron/cleanup-orphans`
+   setiap hari pukul **03:00 Asia/Jakarta**. Route hanya menerima request
+   dengan header `Authorization: Bearer <CRON_SECRET>`; tanpa secret yang
+   valid ia mengembalikan `401`, dan bila `CRON_SECRET` belum diisi ia
+   mengembalikan `503` (tidak pernah jalan tanpa autentikasi). Hanya object
+   yang tidak direferensikan dan berumur >24 jam yang dihapus.
+2. **Manual.** `npm run cleanup:orphans` dari mesin yang punya `.env.local`
+   production.
+
+Verifikasi schedule setelah deploy:
+
+```bash
+vercel schedules list
+vercel schedules inspect cleanup-orphan-proofs
+# jalankan sekali tanpa menghapus apa pun:
+curl -s -H "Authorization: Bearer $CRON_SECRET" \
+  "https://<domain>/api/cron/cleanup-orphans?dry=1"
+```
+
+Parameter `?dry=1` hanya menerima request terautentikasi dan tidak menghapus
+file. Log route hanya mencatat jumlah (`scanned`, `orphans`, `deleted`), bukan
+path atau data pendaftar. Jangan mengekspos `CRON_SECRET` ke browser atau
+menaruhnya di `NEXT_PUBLIC_*`.
 
 ---
 
@@ -282,4 +307,6 @@ membutuhkannya, dan secret server tidak boleh dipakai untuk prerender.
 - Turnstile opsional. Jika site key diisi tetapi secret kosong, form tetap
   meminta token dan submission akan ditolak; isi keduanya atau kosongkan
   keduanya.
-- Cleanup orphan belum terjadwal otomatis (§8).
+- Hapus bukti orphan terjadwal harian lewat Vercel Schedules (§8). Pantau
+  hasilnya di dashboard Vercel → **Schedules**; schedule gagal tidak
+  di-retry otomatis.

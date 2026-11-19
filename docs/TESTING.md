@@ -279,3 +279,24 @@ eslint.config.mjs                     # ignore qa-artifacts
 package.json                          # skrip qa:*
 docs/qa-*-results.md                  # hasil mentah
 ```
+
+---
+
+## 10. PHASE 6 — Scheduled orphan cleanup (19 November 2026)
+
+Route `GET /api/cron/cleanup-orphans` menghapus bukti guestlist yang tidak
+direferensikan dan berumur >24 jam. Vercel Schedules memanggilnya harian
+03:00 Asia/Jakarta (`vercel.json`) dengan `Authorization: Bearer
+$CRON_SECRET`.
+
+| Uji | Hasil |
+|-----|-------|
+| Tanpa header Authorization → `401 unauthorized` | PASS |
+| Bearer token salah → `401 unauthorized` | PASS |
+| `CRON_SECRET` kosong → `503 cron_not_configured` (tidak jalan) | PASS |
+| Token valid + `?dry=1` → `200`, `scanned/orphans/deleted` tanpa path | PASS |
+| `lint` / `typecheck` / `build` | PASS |
+
+Uji dijalankan lokal pada 19 Nov 2026. Pemanggilan nyata (tanpa `?dry=1`)
+belum dijalankan terhadap production karena bucket saat itu kosong; schedule
+pertama akan terlihat di Vercel → **Schedules** setelah deploy.

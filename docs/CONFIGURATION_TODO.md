@@ -3,7 +3,7 @@
 Daftar hal yang masih memakai placeholder atau harus diisi owner sebelum
 production. Update dokumen ini setiap kali satu item selesai.
 
-Terakhir diperbarui: 18 November 2026.
+Terakhir diperbarui: 19 November 2026.
 
 ---
 
@@ -26,7 +26,7 @@ Terakhir diperbarui: 18 November 2026.
 | 13 | Leaked-password protection | **Belum aktif** | Owner |
 | 14 | Warna accent final | Placeholder `#C6FF00` | Owner |
 | 15 | Font brand final | Anton + Inter | Owner |
-| 16 | Jadwal cleanup orphan | Manual | Owner/dev |
+| 16 | Jadwal cleanup orphan | **Selesai** — Vercel Schedule harian 03:00 WIB | Owner/dev |
 
 ---
 
@@ -167,13 +167,18 @@ Isi lewat admin dashboard:
 
 ### 16. Cleanup orphan
 
-- Script: `npm run cleanup:orphans -- --dry-run` lalu
-  `npm run cleanup:orphans`.
-- Butuh `SUPABASE_SECRET_KEY` production.
-- Belum ada cron terproteksi. Jadwalkan manual bulanan, atau tambahkan route
-  cron terproteksi di phase berikutnya.
-- **Verifikasi:** dry-run tidak menghapus apa pun; file yang direferensikan
-  tetap ada.
+- **Terjadwal:** `vercel.json` → schedule `cleanup-orphan-proofs` memanggil
+  `/api/cron/cleanup-orphans` setiap hari 03:00 Asia/Jakarta. Wajib isi
+  `CRON_SECRET` (minimal 16 karakter) di Vercel Production dan redeploy.
+- **Manual:** `npm run cleanup:orphans -- --dry-run` lalu
+  `npm run cleanup:orphans` (butuh `SUPABASE_SECRET_KEY` production).
+- Hanya file tanpa referensi dan berumur >24 jam yang dihapus.
+- **Verifikasi:** `vercel schedules list`, lalu
+  `curl -H "Authorization: Bearer $CRON_SECRET" "<base>/api/cron/cleanup-orphans?dry=1"`;
+  response berisi `scanned`/`orphans`/`deleted` tanpa path. Dry-run tidak
+  menghapus apa pun; file yang direferensikan tetap ada.
+- Pantau dashboard Vercel → **Schedules**; schedule gagal tidak di-retry
+  otomatis.
 
 ---
 
@@ -193,6 +198,8 @@ Isi lewat admin dashboard:
 - [ ] Turnstile diputuskan: aktif dengan pasangan key, atau kosong.
 - [ ] `npm run lint`, `typecheck`, `build` lulus.
 - [ ] Smoke test `docs/DEPLOYMENT.md` §7 lulus.
+- [ ] `CRON_SECRET` terisi di Vercel Production dan schedule
+      `cleanup-orphan-proofs` muncul di `vercel schedules list`.
 - [ ] Link guestlist dibagikan dari domain final.
 - [ ] Secret key disimpan di password manager owner.
 
@@ -205,3 +212,4 @@ Isi lewat admin dashboard:
 | 18 Nov 2026 | Dokumen dibuat; status awal sebelum deploy | Dev |
 | 18 Nov 2026 | Repo GitHub `louddjakarta-ship-it/Loud-Website-` dibuat, branch `main` di-push | Dev |
 | 18 Nov 2026 | Deploy production Vercel `loud-jakarta` → https://loud-jakarta.vercel.app; QA production 245/245 | Dev |
+| 19 Nov 2026 | Cleanup orphan dijadwalkan harian lewat Vercel Schedules + route `CRON_SECRET` | Dev |
