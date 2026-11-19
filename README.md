@@ -221,10 +221,12 @@ docs/
 
 ## Admin
 
-- Login: `http://localhost:3000/admin/login` (Supabase Auth).
+- Login: `http://localhost:3000/admin/login` dengan **username + password**
+  (password diverifikasi Supabase Auth).
 - Akun harus punya baris aktif di `admin_profiles`; jika tidak, login ditolak.
-- Role: `super_admin` (semua aksi) dan `staff` (event + review guestlist).
-  Arsip/hapus event, hapus pendaftar, dan CSV export khusus super admin.
+- Akun baru dibuat dari `/admin/users` oleh admin yang sudah login. Semua akun
+  baru mendapat akses admin yang sama.
+- Setiap admin bisa mengganti password sendiri di `/admin/account`.
 - Izin diperiksa di server action/route handler dan database, bukan hanya UI.
 - Review guestlist mencatat reviewer dan waktu lewat trigger database.
 - Preview bukti memakai signed URL yang berlaku 60 detik.
@@ -242,7 +244,7 @@ Panduan operasional ada di `docs/PHASE-4-ADMIN.md`.
 - Security headers + **CSP nonce** aktif (`src/proxy.ts`,
   `src/lib/security/csp.ts`). Semua halaman dirender dinamis agar nonce bisa
   diterapkan; tidak ada `unsafe-inline` untuk script.
-- Login admin dibatasi 10 percobaan / 15 menit per kombinasi IP + email
+- Login admin dibatasi 10 percobaan / 15 menit per kombinasi IP + username
   (`submission_attempts.kind = 'login'`, hanya hash yang disimpan).
 - Guestlist dibatasi 10 signed URL / 10 menit dan 5 submission / jam per IP
   hash; Turnstile wajib bila secret diisi.

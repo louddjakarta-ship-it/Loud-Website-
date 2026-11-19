@@ -30,21 +30,26 @@ export function LoginForm({ next }: { next?: string }) {
       ) : null}
 
       <div>
-        <Label htmlFor="admin-email">Email</Label>
+        <Label htmlFor="admin-username">Username</Label>
         <Input
-          id="admin-email"
-          name="email"
-          type="email"
-          autoComplete="email"
+          id="admin-username"
+          name="username"
+          type="text"
+          autoComplete="username"
+          autoCapitalize="none"
+          autoCorrect="off"
+          spellCheck={false}
           required
           disabled={pending}
-          aria-invalid={state.fields?.email ? true : undefined}
+          aria-invalid={state.fields?.username ? true : undefined}
           aria-describedby={
-            state.fields?.email ? "admin-email-error" : undefined
+            state.fields?.username ? "admin-username-error" : undefined
           }
-          placeholder="you@loudjakarta.com"
+          placeholder="your username"
         />
-        <FieldError id="admin-email-error">{state.fields?.email}</FieldError>
+        <FieldError id="admin-username-error">
+          {state.fields?.username}
+        </FieldError>
       </div>
 
       <div>
@@ -72,7 +77,7 @@ export function LoginForm({ next }: { next?: string }) {
       </Button>
 
       <p className="text-sm leading-relaxed text-muted">
-        Admin accounts are created manually by the owner. There is no public
+        Accounts are created by an admin from the dashboard. There is no public
         sign-up.
       </p>
     </form>

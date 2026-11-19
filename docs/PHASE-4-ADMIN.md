@@ -109,8 +109,9 @@ event:
 
 ## 3. Alur autentikasi dan otorisasi
 
-1. `/admin/login` memakai `supabase.auth.signInWithPassword` — tidak ada
-   sistem password sendiri.
+1. `/admin/login` menerima **username + password**. Server memetakan username
+   ke user Supabase Auth lewat `admin_profiles.username`, lalu memanggil
+   `supabase.auth.signInWithPassword` — tidak ada sistem password sendiri.
 2. Setelah login, profil `admin_profiles` dicek. Akun tanpa profil aktif
    langsung di-sign out dan mendapat pesan generik.
 3. `src/proxy.ts` hanya melakukan refresh cookie + redirect optimistis.

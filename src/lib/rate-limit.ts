@@ -146,18 +146,19 @@ export async function enforceRateLimit({
 }
 
 /**
- * Admin sign-in limiter. The key combines IP and email so one noisy IP cannot
- * lock every admin out, and one email cannot be brute-forced from many IPs.
+ * Admin sign-in limiter. The key combines IP and username so one noisy IP
+ * cannot lock every admin out, and one username cannot be brute-forced from
+ * many IPs.
  */
 export async function enforceLoginRateLimit({
   headers,
-  email,
+  username,
 }: {
   headers: Headers;
-  email: string;
+  username: string;
 }): Promise<RateLimitResult> {
   const key = hashValue(
-    `login:${getClientIp(headers)}:${email.trim().toLowerCase()}`,
+    `login:${getClientIp(headers)}:${username.trim().toLowerCase()}`,
   );
 
   return checkAndRecord({ kind: "login", key, eventId: null });

@@ -6,11 +6,20 @@ import { z } from "zod";
 
 import { zodFieldErrors } from "@/lib/api";
 import type { LoginState } from "@/lib/auth/login-state";
+import { normalizeUsername, USERNAME_PATTERN } from "@/lib/auth/username";
 import { enforceLoginRateLimit } from "@/lib/rate-limit";
+import { createAdminSupabaseClient } from "@/lib/supabase/admin";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 
 const loginSchema = z.object({
-  email: z.email("Enter a valid email address.").trim().max(254),
+  username: z.preprocess(
+    normalizeUsername,
+    z
+      .string()
+      .min(3, "Enter your username.")
+      .max(32, "Username is too long.")
+      .regex(USERNAME_PATTERN, "That username is not valid."),
+  ),
   password: z
     .string()
     .min(1, "Enter your password.")
@@ -32,7 +41,7 @@ export async function signInAction(
   formData: FormData,
 ): Promise<LoginState> {
   const parsed = loginSchema.safeParse({
-    email: formData.get("email"),
+    username: formData.get("username"),
     password: formData.get("password"),
     next: formData.get("next") ?? undefined,
   });
@@ -50,7 +59,7 @@ export async function signInAction(
   try {
     const limit = await enforceLoginRateLimit({
       headers: await headers(),
-      email: parsed.data.email,
+      username: parsed.data.username,
     });
 
     if (!limit.ok) {
@@ -67,25 +76,53 @@ export async function signInAction(
     };
   }
 
+  const admin = createAdminSupabaseClient();
+  const { data: profile, error: profileError } = await admin
+    .from("admin_profiles")
+    .select("id,is_active")
+    .eq("username", parsed.data.username)
+    .maybeSingle();
+
+  if (profileError || !profile || !profile.is_active) {
+    return {
+      status: "error",
+      message: "Invalid username or password.",
+    };
+  }
+
+  const { data: authUser, error: authUserError } =
+    await admin.auth.admin.getUserById(profile.id);
+
+  if (authUserError || !authUser.user?.email) {
+    return {
+      status: "error",
+      message: "Invalid username or password.",
+    };
+  }
+
   const { data, error } = await supabase.auth.signInWithPassword({
-    email: parsed.data.email,
+    email: authUser.user.email,
     password: parsed.data.password,
   });
 
   if (error || !data.user) {
     return {
       status: "error",
-      message: "Invalid email or password.",
+      message: "Invalid username or password.",
     };
   }
 
-  const { data: profile, error: profileError } = await supabase
+  const { data: activeProfile, error: activeProfileError } = await supabase
     .from("admin_profiles")
     .select("role,is_active")
     .eq("id", data.user.id)
     .maybeSingle();
 
-  if (profileError || !profile || !profile.is_active) {
+  if (
+    activeProfileError ||
+    !activeProfile ||
+    !activeProfile.is_active
+  ) {
     await supabase.auth.signOut();
 
     return {

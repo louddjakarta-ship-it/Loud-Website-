@@ -20,7 +20,7 @@ Terakhir diperbarui: 19 November 2026.
 | 7 | Flyer event asli | Placeholder generatif | Owner |
 | 8 | Data event (nama, tanggal, venue, map) | Sebagian dummy | Owner |
 | 9 | Daftar PR | Input bebas di form | Owner |
-| 10 | Email admin pertama | Perlu konfirmasi | Owner |
+| 10 | Akun admin pertama | **Selesai** — username `owner` / `admin` | Owner/dev |
 | 11 | Privacy policy final | Draft | Owner |
 | 12 | Turnstile production keys | Opsional | Owner |
 | 13 | Leaked-password protection | **Belum aktif** | Owner |
@@ -115,11 +115,13 @@ Isi lewat admin dashboard:
 - Jika owner ingin daftar tetap, perlu perubahan kode + validasi; catat sebagai
   backlog, bukan blocker launch.
 
-### 10. Email admin
+### 10. Akun admin
 
-- Dibuat manual di Supabase Auth (lihat `docs/ADMIN_SETUP.md`).
-- Gunakan email yang benar-benar dimonitor owner.
-- Jangan memakai email pribadi staff untuk akun owner.
+- Login memakai **username + password**, bukan email.
+- Buat akun baru dari `/admin/users` setelah login sebagai admin.
+- User bisa mengganti password sendiri di `/admin/account`.
+- Email internal di Supabase Auth hanya dipakai di balik layar dan tidak perlu
+  dimonitor.
 
 ### 11. Privacy policy
 
@@ -184,8 +186,8 @@ Isi lewat admin dashboard:
 
 ## 3. Checklist sebelum go-live
 
-- [ ] Semua migration di Supabase production sudah dijalankan (9 file).
-- [ ] Admin production bisa login; staff (jika ada) punya role benar.
+- [ ] Semua migration di Supabase production sudah dijalankan (10 file).
+- [ ] Admin production bisa login dengan username + password.
 - [ ] Sign-up publik mati; leaked-password protection aktif.
 - [ ] Domain + HTTPS aktif; `NEXT_PUBLIC_SITE_URL` sudah diperbarui dan
       redeploy.
@@ -213,3 +215,4 @@ Isi lewat admin dashboard:
 | 18 Nov 2026 | Repo GitHub `louddjakarta-ship-it/Loud-Website-` dibuat, branch `main` di-push | Dev |
 | 18 Nov 2026 | Deploy production Vercel `loud-jakarta` → https://loud-jakarta.vercel.app; QA production 245/245 | Dev |
 | 19 Nov 2026 | Cleanup orphan dijadwalkan harian lewat Vercel Schedules + route `CRON_SECRET` | Dev |
+| 19 Nov 2026 | Login username + halaman `/admin/users` (semua admin sama) + ganti password `/admin/account` | Dev |

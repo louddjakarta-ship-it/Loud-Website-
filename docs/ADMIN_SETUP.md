@@ -13,14 +13,20 @@ Dashboard + SQL Editor.
 
 | Lapisan | Apa yang menentukan akses |
 |---------|---------------------------|
-| Supabase Auth | Email + password; sesi dikelola cookie oleh `@supabase/ssr` |
-| `public.admin_profiles` | `role` (`super_admin` / `staff`) dan `is_active` |
+| Supabase Auth | Username + password; sesi dikelola cookie oleh `@supabase/ssr` |
+| `public.admin_profiles` | `username` (login handle), `role`, dan `is_active` |
 | RLS + helper `private.is_admin()` | Menolak user tanpa profil aktif |
 | Server action / route handler | Cek role sebelum aksi sensitif |
 | UI | Menyembunyikan tombol yang tidak diizinkan, bukan pengganti otorisasi |
 
-Login dianggap berhasil hanya jika user punya baris `admin_profiles` dengan
-`is_active = true`. Jika tidak, sesi langsung diakhiri dengan pesan generik.
+Login di `/admin/login` memakai **username + password**, bukan email. Server
+mencari baris `admin_profiles` berdasarkan username, lalu memverifikasi
+password ke Supabase Auth. Login dianggap berhasil hanya jika user punya baris
+`admin_profiles` dengan `is_active = true`. Jika tidak, sesi langsung diakhiri
+dengan pesan generik.
+
+Akun baru dibuat dari halaman **`/admin/users`** oleh admin yang sudah login.
+Semua akun yang dibuat dari halaman itu mendapat akses admin yang sama.
 
 ### Hak per role
 
@@ -44,18 +50,19 @@ Lakukan sekali saat setup project. Detail kredensial ada di
 `docs/SUPABASE_SETUP.md` §7.
 
 1. Supabase Dashboard → **Authentication → Users → Add user**.
-   - Email admin asli (mis. `owner@<domain>`).
+   - Email internal (mis. `owner@admin.loudjakarta.com`; tidak perlu aktif).
    - Password kuat dan unik.
    - Centang **Auto Confirm User**.
 2. Copy UUID user.
 3. SQL Editor:
 
    ```sql
-   insert into public.admin_profiles (id, display_name, role)
-   values ('<uuid-user>', 'Owner', 'super_admin');
+   insert into public.admin_profiles (id, username, display_name, role)
+   values ('<uuid-user>', 'owner', 'Owner', 'super_admin');
    ```
 
-4. Buka `/admin/login`, login, lalu pastikan dashboard tampil.
+4. Buka `/admin/login`, login dengan username `owner` + password tadi, lalu
+   pastikan dashboard tampil.
 5. Simpan kredensial di password manager. Jangan kirim lewat chat atau commit.
 
 Jika langkah 3 terlewat, login akan ditolak walau password benar. Itu perilaku
@@ -63,21 +70,23 @@ yang disengaja.
 
 ---
 
-## 3. Menambah staff
+## 3. Menambah admin
 
-1. Buat user Auth seperti §2 (Auto Confirm).
-2. Insert profil:
+Cara utama: login ke dashboard, buka **`/admin/users`**, lalu isi:
 
-   ```sql
-   insert into public.admin_profiles (id, display_name, role)
-   values ('<uuid-user>', 'Nama Staff', 'staff');
-   ```
+- **Display name** — nama yang tampil di dashboard.
+- **Username** — 3–32 karakter, huruf kecil, angka, titik, underscore, dash.
+- **Password** — biarkan kosong untuk membuat password sementara 16 karakter.
 
-3. Minta staff login dan ganti password sendiri. Owner tidak perlu tahu
-   password staff.
+Password hanya ditampilkan **sekali** setelah akun dibuat. Copy dan kirim ke
+user lewat kanal aman, lalu minta user menggantinya di **`/admin/account`**
+setelah login.
 
-Staff tidak bisa membuat akun admin lain, menghapus event, menghapus
-pendaftar, atau export CSV.
+Semua akun yang dibuat dari halaman ini mendapat akses admin yang sama. Tidak
+ada pilihan role di UI dan tidak ada self-signup.
+
+Jika perlu membuat akun lewat SQL (mis. saat bootstrap), ikuti §2 dan isi
+kolom `username`.
 
 ---
 
@@ -123,6 +132,12 @@ dan login ulang agar UI memuat menu yang benar.
 
 ## 6. Reset password dan lockout
 
+### Ganti password sendiri
+
+Setiap admin yang sudah login bisa membuka **`/admin/account`**, memasukkan
+password saat ini, lalu memilih password baru (minimal 10 karakter). Ini jalur
+utama setelah menerima password sementara dari admin lain.
+
 ### Lupa password
 
 1. Supabase Dashboard → **Authentication → Users** → pilih user →
@@ -132,12 +147,12 @@ dan login ulang agar UI memuat menu yang benar.
 
 ### Terkena rate limit login
 
-Login dibatasi **10 percobaan / 15 menit** per kombinasi hash IP + email
+Login dibatasi **10 percobaan / 15 menit** per kombinasi hash IP + username
 (`submission_attempts.kind = 'login'`). Setelah batas tercapai, login
 mengembalikan pesan generik sampai jendela waktu lewat.
 
 - Tunggu 15 menit, atau
-- Hapus baris rate limit untuk email tersebut (butuh akses SQL):
+- Hapus baris rate limit untuk username tersebut (butuh akses SQL):
 
   ```sql
   delete from public.submission_attempts
@@ -163,7 +178,8 @@ Pastikan memang disengaja. Jika tidak, set kembali `true` dan minta user login.
 - Untuk melihat admin aktif:
 
   ```sql
-  select p.id, p.display_name, p.role, p.is_active, u.email, u.last_sign_in_at
+  select p.username, p.display_name, p.role, p.is_active, u.email,
+         u.last_sign_in_at
   from public.admin_profiles p
   join auth.users u on u.id = p.id
   order by p.role, p.display_name;

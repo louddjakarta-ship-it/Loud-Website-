@@ -23,7 +23,8 @@ const SUPABASE_URL = (process.env.NEXT_PUBLIC_SUPABASE_URL ?? "").replace(
 );
 const SECRET_KEY = process.env.SUPABASE_SECRET_KEY ?? "";
 const STAMP = Date.now();
-const EMAIL = `qa-login-${STAMP}@loudjakarta.test`;
+const USERNAME = `qa-login-${STAMP}`;
+const EMAIL = `${USERNAME}@admin.loudjakarta.com`;
 const CORRECT_PASSWORD = `Qa-${crypto.randomUUID()}`;
 const STARTED_AT = new Date().toISOString();
 
@@ -86,6 +87,7 @@ try {
     body: [
       {
         id: userId,
+        username: USERNAME,
         display_name: "QA Login",
         role: "staff",
         is_active: true,
@@ -104,7 +106,7 @@ try {
     await page.waitForFunction(
       () => !document.querySelector('button[type="submit"]')?.disabled,
     );
-    await page.fill("#admin-email", EMAIL);
+    await page.fill("#admin-username", USERNAME);
     await page.fill("#admin-password", password);
 
     const responsePromise = page.waitForResponse(
@@ -140,9 +142,9 @@ try {
     "ten wrong passwords are rejected generically",
     wrongMessages.length === 10 &&
       wrongMessages.every((message) =>
-        message.includes("Invalid email or password"),
+        message.includes("Invalid username or password"),
       ),
-    `${wrongMessages.filter((m) => m.includes("Invalid email or password")).length}/10 generic`,
+    `${wrongMessages.filter((m) => m.includes("Invalid username or password")).length}/10 generic`,
   );
 
   const blocked = await attempt(CORRECT_PASSWORD);

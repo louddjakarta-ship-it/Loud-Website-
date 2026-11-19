@@ -9,10 +9,17 @@ import type { AdminSession } from "@/lib/auth/admin";
 import { cn } from "@/lib/cn";
 
 const navItems = [
-  { href: "/admin", label: "Dashboard", exact: true },
-  { href: "/admin/events", label: "Events", exact: false },
-  { href: "/admin/gallery", label: "Gallery", exact: false },
-  { href: "/admin/guestlist", label: "Guestlist", exact: false },
+  { href: "/admin", label: "Dashboard", exact: true, adminOnly: false },
+  { href: "/admin/events", label: "Events", exact: false, adminOnly: false },
+  { href: "/admin/gallery", label: "Gallery", exact: false, adminOnly: false },
+  {
+    href: "/admin/guestlist",
+    label: "Guestlist",
+    exact: false,
+    adminOnly: false,
+  },
+  { href: "/admin/users", label: "Users", exact: false, adminOnly: true },
+  { href: "/admin/account", label: "Account", exact: false, adminOnly: false },
 ] as const;
 
 export function AdminShell({
@@ -50,7 +57,7 @@ export function AdminShell({
                 {admin.displayName || admin.email || "Admin"}
               </p>
               <p className="font-mono text-[0.6rem] uppercase tracking-[0.08em] text-muted">
-                {admin.role === "super_admin" ? "Super admin" : "Staff"}
+                {admin.role === "super_admin" ? "Admin" : "Staff"}
               </p>
             </div>
 
@@ -70,6 +77,10 @@ export function AdminShell({
           className="shell flex gap-1 overflow-x-auto border-t border-line/60 py-2"
         >
           {navItems.map((item) => {
+            if (item.adminOnly && admin.role !== "super_admin") {
+              return null;
+            }
+
             const active = isActive(item.href, item.exact);
 
             return (

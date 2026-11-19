@@ -22,6 +22,7 @@ export type Database = {
           is_active: boolean;
           role: Database["public"]["Enums"]["admin_role"];
           updated_at: string;
+          username: string | null;
         };
         Insert: {
           created_at?: string;
@@ -30,6 +31,7 @@ export type Database = {
           is_active?: boolean;
           role?: Database["public"]["Enums"]["admin_role"];
           updated_at?: string;
+          username?: string | null;
         };
         Update: {
           created_at?: string;
@@ -38,6 +40,7 @@ export type Database = {
           is_active?: boolean;
           role?: Database["public"]["Enums"]["admin_role"];
           updated_at?: string;
+          username?: string | null;
         };
         Relationships: [];
       };

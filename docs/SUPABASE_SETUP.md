@@ -54,15 +54,18 @@ NEXT_PUBLIC_SITE_URL=http://localhost:3000
 Karena admin dibuat manual (tidak ada self-signup):
 
 1. **Authentication → Providers → Email**
-   - Pastikan Email provider **loudd.jkt@gmail.com** (untuk login admin).
-   - Matikan **Allow new users to sign up**.
+   - Aktifkan Email provider (dipakai Supabase Auth di balik layar).
+   - **Allow new users to sign up: matikan.** Akun hanya dibuat dari
+     dashboard `/admin/users`.
 2. **Authentication → Settings**
-   - Biarkan email confirmation sesuai kebutuhan. Saat membuat admin manual
-     dari dashboard, centang **Auto Confirm User**.
+   - Biarkan email confirmation sesuai kebutuhan. Saat membuat akun dari
+     dashboard Supabase, centang **Auto Confirm User**. Akun yang dibuat dari
+     `/admin/users` otomatis terkonfirmasi.
 3. **Authentication → Password security**
    - Aktifkan **Prevent use of leaked passwords** (cek HaveIBeenPwned).
      Supabase advisor menandai ini sampai diaktifkan; wajib sebelum production.
-4. Tidak ada endpoint publik untuk membuat akun admin.
+4. Login admin memakai **username + password**, bukan email. Tidak ada endpoint
+   publik untuk membuat akun admin.
 
 ## 4. Jalankan migration
 
@@ -176,23 +179,22 @@ Database tidak menyimpan admin default. Buat akun asli sebelum membuka
 `/admin/login`.
 
 1. **Authentication → Users → Add user**
-   - Email admin asli.
+   - Email internal (mis. `owner@admin.loudjakarta.com`; tidak perlu aktif).
    - Password kuat.
    - Centang **Auto Confirm User**.
 2. Copy UUID user tersebut.
 3. Jalankan di SQL Editor:
 
 ```sql
-insert into public.admin_profiles (id, display_name, role)
-values ('<uuid-user>', 'Owner', 'super_admin');
+insert into public.admin_profiles (id, username, display_name, role)
+values ('<uuid-user>', 'owner', 'Owner', 'super_admin');
 ```
 
-4. Login di `/admin/login`. Akun tanpa baris `admin_profiles` aktif akan
-   langsung di-sign out dengan pesan generik.
+4. Login di `/admin/login` dengan username `owner` + password tadi. Akun tanpa
+   baris `admin_profiles` aktif akan langsung di-sign out dengan pesan generik.
 
-Untuk menambah staff operasional, ulangi langkah yang sama dengan
-`role = 'staff'`. Staff bisa mengelola event dan mereview guestlist, tetapi
-tidak bisa arsip/hapus event, hapus pendaftar, atau export CSV.
+Untuk menambah admin berikutnya, login lalu buka **`/admin/users`**. Semua akun
+yang dibuat dari sana mendapat akses admin yang sama.
 
 ## 8. Setelah mengubah `.env.local`
 
