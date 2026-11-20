@@ -82,9 +82,14 @@ Jalankan migration sesuai urutan:
 7. `supabase/migrations/20261117113000_site_settings.sql`
 8. `supabase/migrations/20261117115000_gallery_photos.sql`
 9. `supabase/migrations/20261118090000_login_rate_limit.sql`
+10. `supabase/migrations/20261119120000_admin_username.sql`
+11. `supabase/migrations/20261119150000_admin_roles_dj.sql`
+12. `supabase/migrations/20261119151000_djs.sql`
+13. `supabase/migrations/20261120100000_djs_anon_select.sql`
 
 Untuk setiap file: **SQL Editor → New query → paste → Run**. Pastikan tidak ada
-error sebelum lanjut ke file berikutnya.
+error sebelum lanjut ke file berikutnya. Migration 11 menambah enum `dj` dan
+harus selesai di-commit sebelum migration 12 dijalankan.
 
 Migration ini membuat:
 
@@ -107,6 +112,12 @@ Migration ini membuat:
   jpeg/png/webp) untuk gallery homepage; hanya admin yang bisa insert/delete
   foto maupun object Storage
 - kind `login` pada `submission_attempts` untuk rate limit login admin
+- kolom `admin_profiles.username` untuk login username + password
+- enum `dj`, kolom `admin_profiles.roles` (multi-role), dan helper
+  `private.has_role` / `private.is_dj`
+- tabel `djs` (presskit DJ) + bucket publik `dj-photos` (5 MB,
+  jpeg/png/webp); publik hanya bisa membaca, akun DJ hanya bisa menulis
+  folder miliknya sendiri
 
 **Cara B — Supabase CLI**
 

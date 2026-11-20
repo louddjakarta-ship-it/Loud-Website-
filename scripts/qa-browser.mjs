@@ -32,6 +32,7 @@ const VIEWPORTS = [
 
 const PAGES = [
   { name: "home", path: "/" },
+  { name: "djs", path: "/djs" },
   { name: "privacy", path: "/privacy" },
   { name: "login", path: "/admin/login" },
   { name: "not-found", path: "/this-page-does-not-exist", expect: 404 },

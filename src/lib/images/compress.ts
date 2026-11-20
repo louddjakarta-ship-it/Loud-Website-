@@ -7,6 +7,9 @@ const FLYER_WEBP_QUALITY = 0.85;
 const GALLERY_MAX_DIMENSION = 2400;
 const GALLERY_WEBP_QUALITY = 0.86;
 const GALLERY_ASPECT_RATIO = 16 / 9;
+const DJ_MAX_DIMENSION = 1600;
+const DJ_WEBP_QUALITY = 0.85;
+const DJ_ASPECT_RATIO = 4 / 5;
 const ALLOWED_OUTPUT_TYPES = new Set<ProofMimeType>([
   "image/jpeg",
   "image/png",
@@ -202,5 +205,17 @@ export function compressGalleryImage(file: File): Promise<CompressedImage> {
     maxDimension: GALLERY_MAX_DIMENSION,
     quality: GALLERY_WEBP_QUALITY,
     aspectRatio: GALLERY_ASPECT_RATIO,
+  });
+}
+
+/**
+ * Compresses a DJ presskit portrait in the browser: centre-cropped to a 4:5
+ * portrait, max 1600 px, WebP at quality 0.85.
+ */
+export function compressDjPhoto(file: File): Promise<CompressedImage> {
+  return compressImage(file, {
+    maxDimension: DJ_MAX_DIMENSION,
+    quality: DJ_WEBP_QUALITY,
+    aspectRatio: DJ_ASPECT_RATIO,
   });
 }

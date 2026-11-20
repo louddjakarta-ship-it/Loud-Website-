@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 
 import { signOutAction } from "@/app/admin/login/actions";
 import { getAdminSession, getCurrentUser } from "@/lib/auth/admin";
+import { rolesLabel } from "@/lib/auth/roles";
 
 export const dynamic = "force-dynamic";
 
@@ -83,7 +84,7 @@ export default async function AdminUnauthorizedPage({
 
           <p className="mt-5 border-t border-line pt-4 font-mono text-[0.65rem] uppercase tracking-[0.08em] text-muted">
             Signed in as {user.email ?? "unknown account"}
-            {admin ? ` · ${admin.role === "super_admin" ? "Super admin" : "Staff"}` : ""}
+            {admin ? ` · ${rolesLabel(admin.roles)}` : ""}
           </p>
 
           <div className="mt-6 flex flex-wrap gap-3">

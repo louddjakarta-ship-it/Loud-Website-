@@ -7,6 +7,7 @@ import { z } from "zod";
 import type { EventActionState } from "@/lib/admin/event-action-state";
 import { zodFieldErrors } from "@/lib/api";
 import { getAdminSession, type AdminSession } from "@/lib/auth/admin";
+import { hasRole } from "@/lib/auth/roles";
 import { jakartaDateTimeLocalToIso, slugify } from "@/lib/format";
 import {
   detectImageMime,
@@ -453,7 +454,7 @@ async function setEventArchived(
 ): Promise<void> {
   const admin = await requireAdminForForm();
 
-  if (admin.role !== "super_admin") {
+  if (!hasRole(admin.roles, "super_admin")) {
     redirect("/admin/unauthorized?reason=role");
   }
 
@@ -489,7 +490,7 @@ export async function restoreEventAction(formData: FormData): Promise<void> {
 export async function deleteEventAction(formData: FormData): Promise<void> {
   const admin = await requireAdminForForm();
 
-  if (admin.role !== "super_admin") {
+  if (!hasRole(admin.roles, "super_admin")) {
     redirect("/admin/unauthorized?reason=role");
   }
 

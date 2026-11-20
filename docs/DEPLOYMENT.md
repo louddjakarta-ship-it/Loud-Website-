@@ -45,8 +45,9 @@ Periksa juga:
 - [ ] `.env.local` **tidak** ikut ter-commit (`git status --short` bersih).
 - [ ] Tidak ada secret di file yang di-commit:
       `git grep -n "sb_secret_"` harus kosong.
-- [ ] Migration terbaru (`20261118090000_login_rate_limit.sql`) sudah ada di
-      repo dan sudah dijalankan di Supabase tujuan.
+- [ ] Migration terbaru (`20261120100000_djs_anon_select.sql`) sudah ada di repo dan sudah
+      dijalankan di Supabase tujuan (termasuk `20261119150000_admin_roles_dj.sql`
+      sebelumnya).
 - [ ] Event placeholder `PLACEHOLDER — LOUD JAKARTA 001` berstatus
       `is_published = false`.
 - [ ] Data QA sudah bersih (tidak ada event/akun/guestlist berlabel QA).
@@ -175,6 +176,7 @@ Ganti `<base>` dengan `https://<domain-final>` atau URL `*.vercel.app`.
 ```bash
 curl -s -o /dev/null -w "%{http_code}\n" <base>/
 curl -s -o /dev/null -w "%{http_code}\n" <base>/privacy
+curl -s -o /dev/null -w "%{http_code}\n" <base>/djs
 curl -s -o /dev/null -w "%{http_code}\n" <base>/guestlist
 curl -s -o /dev/null -w "%{http_code}\n" <base>/halaman-tidak-ada
 curl -s -o /dev/null -w "%{http_code}\n" <base>/admin
@@ -208,7 +210,11 @@ Harapan:
       menghasilkan 404.
 - [ ] Submit guestlist uji berhasil, lalu hapus baris + object-nya.
 - [ ] `/admin/login` bisa login dengan admin production.
-- [ ] Dashboard, events, gallery, guestlist, CSV export berfungsi.
+- [ ] Dashboard, events, gallery, guestlist, users, CSV export berfungsi.
+- [ ] `/djs` terbuka dan roster menampilkan presskit published (atau empty
+      state bila belum ada).
+- [ ] Akun DJ uji bisa login, menyimpan presskit, dan `/djs/<slug>` tampil;
+      hapus akun + presskit uji setelahnya.
 - [ ] Upload bukti dan preview signed URL (60 detik) berfungsi.
 - [ ] Logout mengembalikan ke halaman login.
 - [ ] Browser console bersih (tidak ada pelanggaran CSP/error 500).

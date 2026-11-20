@@ -13,68 +13,66 @@ export function SiteHeader() {
   );
 
   return (
-    <header className="sticky top-0 z-40 border-b border-line/80 bg-ink/85 backdrop-blur-md">
-      <div className="shell flex h-16 items-center justify-between gap-6">
+    <header className="theme-dark sticky top-0 z-40 border-b border-white/10 bg-ink/80 backdrop-blur-md">
+      <div className="shell flex h-16 items-center justify-between gap-4">
         <Link
           href="/"
-          className="font-display text-xl uppercase leading-none tracking-tight transition-colors hover:text-accent"
+          className="group flex items-center gap-2.5"
+          aria-label="LOUD JAKARTA home"
         >
-          LOUD JAKARTA
+          <span
+            aria-hidden="true"
+            className="h-2 w-2 rounded-full bg-accent transition-transform duration-300 group-hover:scale-125"
+          />
+          <span className="font-display text-xl uppercase leading-none tracking-tight transition-colors group-hover:text-accent">
+            LOUD JAKARTA
+          </span>
         </Link>
 
         <nav
           aria-label="Primary"
-          className="hidden items-center gap-8 font-mono text-micro uppercase tracking-[0.12em] text-muted md:flex"
+          className="hidden items-center gap-1 rounded-full border border-white/10 bg-white/[0.04] p-1 md:flex"
         >
           {primaryNav.map((link) => (
             <Link
               key={link.href}
               href={link.href}
-              className="transition-colors hover:text-paper"
+              className="rounded-full px-4 py-2 font-mono text-micro uppercase tracking-[0.12em] text-white/60 transition-colors hover:bg-white/[0.06] hover:text-white"
             >
               {link.label}
             </Link>
           ))}
-
-          {instagramUrl ? (
-            <a
-              href={instagramUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="transition-colors hover:text-paper"
-            >
-              Instagram
-            </a>
-          ) : (
-            <span
-              aria-disabled="true"
-              title="Official Instagram link coming soon"
-              className="cursor-not-allowed text-muted/50"
-            >
-              Instagram
-              <span className="sr-only"> (coming soon)</span>
-            </span>
-          )}
         </nav>
 
-        <div className="hidden items-center gap-4 md:flex">
+        <div className="flex items-center gap-2">
           {whatsappUrl ? (
             <a
               href={whatsappUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="border border-accent bg-accent px-4 py-2.5 font-mono text-micro uppercase tracking-[0.12em] text-ink transition-colors hover:bg-paper"
+              className="hidden h-10 items-center gap-2 rounded-full bg-accent px-5 font-mono text-micro uppercase tracking-[0.12em] text-ink transition-colors hover:bg-paper sm:inline-flex"
             >
-              RSVP WhatsApp
+              RSVP
+              <span aria-hidden="true">↗</span>
+            </a>
+          ) : instagramUrl ? (
+            <a
+              href={instagramUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hidden h-10 items-center gap-2 rounded-full bg-accent px-5 font-mono text-micro uppercase tracking-[0.12em] text-ink transition-colors hover:bg-paper sm:inline-flex"
+            >
+              Instagram
+              <span aria-hidden="true">↗</span>
             </a>
           ) : null}
-        </div>
 
-        <MobileNav
-          links={primaryNav}
-          instagramUrl={instagramUrl}
-          whatsappUrl={whatsappUrl}
-        />
+          <MobileNav
+            links={primaryNav}
+            instagramUrl={instagramUrl}
+            whatsappUrl={whatsappUrl}
+          />
+        </div>
       </div>
     </header>
   );

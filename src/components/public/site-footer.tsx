@@ -3,6 +3,14 @@ import Link from "next/link";
 import { publicEnv } from "@/lib/env/public";
 import { buildWhatsAppContactUrl } from "@/lib/whatsapp";
 
+const FOOTER_LINKS = [
+  { href: "/#events", label: "Upcoming events" },
+  { href: "/#djs", label: "The DJs" },
+  { href: "/#gallery", label: "Gallery" },
+  { href: "/#how-it-works", label: "How it works" },
+  { href: "/privacy", label: "Privacy" },
+] as const;
+
 export function SiteFooter() {
   const instagramUrl = publicEnv.instagramUrl.trim() || null;
   const whatsappUrl = buildWhatsAppContactUrl(
@@ -11,49 +19,52 @@ export function SiteFooter() {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="border-t border-line">
-      <div className="shell grid gap-10 py-12 lg:grid-cols-12">
-        <div className="lg:col-span-5">
-          <p className="font-display text-3xl uppercase leading-none">
-            LOUD JAKARTA
-          </p>
-          <p className="mt-4 max-w-sm text-sm leading-relaxed text-muted">
-            Underground nightlife, electronic music and contemporary culture
-            in Jakarta. We don&apos;t follow the noise. We make it.
-          </p>
-        </div>
+    <footer className="site-light border-t border-line bg-bone">
+      <div className="shell py-[clamp(56px,8vw,104px)] text-center">
+        <Link
+          href="/"
+          className="inline-flex items-center gap-2 font-display text-4xl uppercase leading-none transition-colors hover:text-olive"
+        >
+          <span
+            aria-hidden="true"
+            className="h-2.5 w-2.5 rounded-full bg-accent"
+          />
+          LOUD JAKARTA
+        </Link>
+
+        <p className="mx-auto mt-5 max-w-md text-sm leading-relaxed text-muted">
+          Underground nightlife, electronic music and contemporary culture in
+          Jakarta. We don&apos;t follow the noise. We make it.
+        </p>
 
         <nav
           aria-label="Footer"
-          className="flex flex-col gap-3 font-mono text-micro uppercase tracking-[0.12em] lg:col-span-3"
+          className="mt-8 flex flex-wrap justify-center gap-2"
         >
-          <span className="text-muted">Explore</span>
-          <Link href="/#events" className="text-paper hover:text-accent">
-            Upcoming events
-          </Link>
-          <Link href="/#gallery" className="text-paper hover:text-accent">
-            Gallery
-          </Link>
-          <Link href="/privacy" className="text-paper hover:text-accent">
-            Privacy
-          </Link>
+          {FOOTER_LINKS.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              className="rounded-full border border-line bg-surface px-4 py-2 font-mono text-[0.55rem] uppercase tracking-[0.1em] text-muted transition-colors hover:border-ink hover:bg-ink hover:text-white"
+            >
+              {link.label}
+            </Link>
+          ))}
         </nav>
 
-        <div className="flex flex-col gap-3 font-mono text-micro uppercase tracking-[0.12em] lg:col-span-4">
-          <span className="text-muted">Contact</span>
-
+        <div className="mt-6 flex flex-wrap justify-center gap-2">
           {instagramUrl ? (
             <a
               href={instagramUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-paper hover:text-accent"
+              className="rounded-full bg-ink px-5 py-2.5 font-mono text-[0.55rem] uppercase tracking-[0.1em] text-white transition-colors hover:bg-olive"
             >
-              Instagram
+              Instagram ↗
             </a>
           ) : (
-            <span className="text-muted" aria-disabled="true">
-              Instagram — coming soon
+            <span className="rounded-full border border-line px-5 py-2.5 font-mono text-[0.55rem] uppercase tracking-[0.1em] text-muted">
+              Instagram — soon
             </span>
           )}
 
@@ -62,26 +73,22 @@ export function SiteFooter() {
               href={whatsappUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-paper hover:text-accent"
+              className="rounded-full border border-line bg-surface px-5 py-2.5 font-mono text-[0.55rem] uppercase tracking-[0.1em] text-paper transition-colors hover:border-ink hover:bg-ink hover:text-white"
             >
-              WhatsApp
+              WhatsApp ↗
             </a>
           ) : (
-            <span className="text-muted" aria-disabled="true">
-              WhatsApp — coming soon
+            <span className="rounded-full border border-line px-5 py-2.5 font-mono text-[0.55rem] uppercase tracking-[0.1em] text-muted">
+              WhatsApp — soon
             </span>
           )}
-
-          <span className="text-muted">
-            Jakarta, Indonesia · WIB (UTC+7)
-          </span>
         </div>
       </div>
 
       <div className="border-t border-line">
-        <div className="shell flex flex-col gap-2 py-5 font-mono text-[0.65rem] uppercase tracking-[0.12em] text-muted sm:flex-row sm:items-center sm:justify-between">
+        <div className="shell flex flex-col gap-2 py-5 font-mono text-[0.6rem] uppercase tracking-[0.1em] text-muted sm:flex-row sm:items-center sm:justify-between">
           <span>© {year} LOUD JAKARTA. All rights reserved.</span>
-          <span>Built for the noise.</span>
+          <span>Jakarta, Indonesia · WIB (UTC+7)</span>
         </div>
       </div>
     </footer>

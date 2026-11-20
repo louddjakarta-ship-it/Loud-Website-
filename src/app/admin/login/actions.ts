@@ -6,6 +6,11 @@ import { z } from "zod";
 
 import { zodFieldErrors } from "@/lib/api";
 import type { LoginState } from "@/lib/auth/login-state";
+import {
+  hasAdminAccess,
+  hasRole,
+  mergeRoles,
+} from "@/lib/auth/roles";
 import { normalizeUsername, USERNAME_PATTERN } from "@/lib/auth/username";
 import { enforceLoginRateLimit } from "@/lib/rate-limit";
 import { createAdminSupabaseClient } from "@/lib/supabase/admin";
@@ -79,7 +84,7 @@ export async function signInAction(
   const admin = createAdminSupabaseClient();
   const { data: profile, error: profileError } = await admin
     .from("admin_profiles")
-    .select("id,is_active")
+    .select("id,is_active,role,roles")
     .eq("username", parsed.data.username)
     .maybeSingle();
 
@@ -114,14 +119,17 @@ export async function signInAction(
 
   const { data: activeProfile, error: activeProfileError } = await supabase
     .from("admin_profiles")
-    .select("role,is_active")
+    .select("role,roles,is_active")
     .eq("id", data.user.id)
     .maybeSingle();
+
+  const roles = mergeRoles(activeProfile?.role, activeProfile?.roles);
 
   if (
     activeProfileError ||
     !activeProfile ||
-    !activeProfile.is_active
+    !activeProfile.is_active ||
+    roles.length === 0
   ) {
     await supabase.auth.signOut();
 
@@ -132,7 +140,13 @@ export async function signInAction(
     };
   }
 
-  redirect(safeNextPath(parsed.data.next));
+  const destination = hasAdminAccess(roles)
+    ? safeNextPath(parsed.data.next)
+    : hasRole(roles, "dj")
+      ? "/dj"
+      : "/admin/unauthorized";
+
+  redirect(destination);
 }
 
 export async function signOutAction(): Promise<void> {

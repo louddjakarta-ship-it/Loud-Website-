@@ -10,6 +10,7 @@ import {
   type GuestlistStatus,
 } from "@/lib/admin/guestlist-filters";
 import { requireAdmin } from "@/lib/auth/admin";
+import { hasRole } from "@/lib/auth/roles";
 import { formatEventDateTime } from "@/lib/format";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 
@@ -108,7 +109,7 @@ export default async function AdminGuestlistPage({
           </p>
         </div>
 
-        {admin.role === "super_admin" ? (
+        {hasRole(admin.roles, "super_admin") ? (
           <ButtonLink
             href={`/api/admin/guestlist/export${buildGuestlistQuery({
               ...filters,

@@ -3,21 +3,22 @@
 Website event organizer LOUD JAKARTA: upcoming events, RSVP WhatsApp, gallery
 foto, dan guestlist privat lewat link yang dibagikan admin.
 
-Status: **PHASE 5 — Security & QA selesai; PHASE 6 — Deployment production
-aktif.** Public website (homepage, RSVP WhatsApp, gallery) dan admin dashboard
-(login, event management, gallery, homepage copy, guestlist link, review
-guestlist, CSV export) sudah terhubung ke Supabase dan berjalan di
-**https://loud-jakarta.vercel.app**. Domain final masih menunggu owner;
-panduannya ada di `docs/CUSTOM_DOMAIN.md`. Data yang masih placeholder ada di
-`docs/CONFIGURATION_TODO.md`.
+Status: **PHASE 7 — DJ presskit selesai; PHASE 6 — Deployment production
+aktif.** Public website (homepage, RSVP WhatsApp, gallery, roster DJ) dan
+admin dashboard (login, event management, gallery, homepage copy, guestlist
+link, review guestlist, CSV export, manajemen akun + role) sudah terhubung ke
+Supabase dan berjalan di **https://loud-jakarta.vercel.app**. Domain final
+masih menunggu owner; panduannya ada di `docs/CUSTOM_DOMAIN.md`. Data yang
+masih placeholder ada di `docs/CONFIGURATION_TODO.md`.
 Guestlist bersifat **link-only**: pengunjung hanya melihat upcoming events,
 sedangkan form guestlist hanya terbuka lewat `/guestlist/<token>` yang
 di-copy admin dari `/admin/events`.
 
 QA: 43 uji RLS/Storage, 18 uji API guestlist, 3 uji Turnstile, 3 uji rate
-limit login, dan 245 uji browser (responsive + axe WCAG A/AA) semuanya lulus.
-CSP nonce dan security headers sudah aktif. Lihat `docs/TESTING.md` untuk hasil
-lengkap dan sisa uji manual. Item yang masih butuh data owner ada di
+limit login, 245 uji browser (responsive + axe WCAG A/AA), dan 24 uji DJ
+presskit semuanya lulus. CSP nonce dan security headers sudah aktif. Lihat
+`docs/TESTING.md` dan `docs/PHASE-7-DJ.md` untuk hasil lengkap serta sisa uji
+manual. Item yang masih butuh data owner ada di
 `docs/CONFIGURATION_TODO.md`.
 
 ## Stack
@@ -129,6 +130,17 @@ Tagline dan description hero bisa diedit dari section **Homepage copy** di
 `/admin`, disimpan di tabel singleton `site_settings`. Publik hanya bisa
 membaca; perubahan langsung tampil setelah disimpan.
 
+## DJ presskit
+
+- Roster publik ada di `/djs`; tiap presskit punya halaman `/djs/<slug>` dan
+  ikut tampil di section `/#djs` pada homepage.
+- Akun dengan role `dj` mengedit presskit-nya sendiri di `/dj` (foto, bio,
+  genre, venue, Instagram, publish/unpublish).
+- Foto disimpan di bucket publik `dj-photos` dengan path acak
+  `<profileId>/<uuid>.webp`; hanya pemilik yang bisa upload/hapus.
+- Super admin membuat akun DJ dan mengatur role dari `/admin/users`.
+- Detail lengkap: `docs/PHASE-7-DJ.md`.
+
 ## Scripts
 
 | Perintah | Fungsi |
@@ -143,6 +155,7 @@ membaca; perubahan langsung tampil setelah disimpan.
 | `npm run qa:browser` | Responsive + CSP + axe WCAG (butuh server jalan) |
 | `npm run qa:turnstile` | Uji token Turnstile wajib (server terpisah) |
 | `npm run qa:login` | Uji rate limit login admin |
+| `npm run qa:dj` | Uji end-to-end akun DJ + presskit + tampilan publik |
 | `npm run cleanup:orphans -- --dry-run` | Lihat file bukti orphan (>24 jam) |
 | `npm run cleanup:orphans` | Hapus file bukti orphan |
 
@@ -155,8 +168,9 @@ Detail di `docs/DEPLOYMENT.md` §8.
 ```text
 src/
 ├── app/
-│   ├── (site)/          # homepage, guestlist privat, privacy (public layout)
-│   ├── admin/           # login, dashboard, events, gallery, guestlist, actions
+│   ├── (site)/          # homepage, guestlist privat, privacy, roster + presskit DJ
+│   ├── admin/           # login, dashboard, events, gallery, guestlist, users, actions
+│   ├── dj/              # editor presskit + halaman akun DJ
 │   ├── api/
 │   │   ├── cron/        # scheduled orphan-proof cleanup
 │   │   ├── guestlist/   # signed upload URL + final submission
@@ -166,7 +180,8 @@ src/
 │   └── sitemap.ts
 ├── components/
 │   ├── admin/           # shell, event form, gallery upload, login form, confirm form
-│   ├── public/          # header, hero, event card, gallery, form, footer
+│   ├── public/          # header, hero, event card, gallery, DJ grid, form, footer
+│   ├── dj/              # shell + form editor presskit
 │   └── ui/              # button, field primitives
 ├── lib/
 │   ├── admin/           # guestlist filter parsing, action state
@@ -258,6 +273,7 @@ Panduan operasional ada di `docs/PHASE-4-ADMIN.md`.
 - `docs/PHASE-2-SETUP.md` — setup Next.js, Tailwind, Supabase client
 - `docs/PHASE-3-PUBLIC.md` — hasil public website + verifikasi
 - `docs/PHASE-4-ADMIN.md` — hasil admin dashboard, izin, audit, verifikasi
+- `docs/PHASE-7-DJ.md` — role DJ, presskit publik, storage, hasil QA (PHASE 7)
 - `docs/TESTING.md` — checklist dan hasil Security & QA (PHASE 5)
 - `docs/DEPLOYMENT.md` — langkah deploy ke Vercel + smoke test (PHASE 6)
 - `docs/CUSTOM_DOMAIN.md` — domain, DNS, HTTPS, Supabase Auth URL

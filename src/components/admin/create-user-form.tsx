@@ -115,6 +115,51 @@ export function CreateUserForm() {
         </FieldError>
       </div>
 
+      <fieldset>
+        <legend className="mb-2 block font-mono text-micro uppercase tracking-[0.12em] text-muted">
+          Roles
+        </legend>
+        <div className="grid gap-2 border border-line bg-ink p-4">
+          <label className="flex items-start gap-3 text-sm leading-relaxed text-muted">
+            <input
+              type="checkbox"
+              name="roles"
+              value="admin"
+              defaultChecked
+              disabled={pending}
+              className="mt-1 h-4 w-4 accent-accent"
+            />
+            <span>
+              <span className="font-mono text-[0.7rem] uppercase tracking-[0.08em] text-paper">
+                Admin
+              </span>
+              <span className="mt-0.5 block">
+                Dashboard, events, guestlist, gallery.
+              </span>
+            </span>
+          </label>
+
+          <label className="flex items-start gap-3 text-sm leading-relaxed text-muted">
+            <input
+              type="checkbox"
+              name="roles"
+              value="dj"
+              disabled={pending}
+              className="mt-1 h-4 w-4 accent-accent"
+            />
+            <span>
+              <span className="font-mono text-[0.7rem] uppercase tracking-[0.08em] text-paper">
+                DJ
+              </span>
+              <span className="mt-0.5 block">
+                Edit their own presskit on the public DJ page.
+              </span>
+            </span>
+          </label>
+        </div>
+        <FieldError id="user-roles-error">{state.fields?.roles}</FieldError>
+      </fieldset>
+
       <div>
         <Label htmlFor="user-username">Username</Label>
         <Input

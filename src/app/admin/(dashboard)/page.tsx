@@ -3,6 +3,7 @@ import Link from "next/link";
 
 import { SiteSettingsForm } from "@/components/admin/site-settings-form";
 import { requireAdmin } from "@/lib/auth/admin";
+import { hasRole, rolesLabel } from "@/lib/auth/roles";
 import { getSiteSettings } from "@/lib/data/site-settings";
 import { formatEventDateTime } from "@/lib/format";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
@@ -112,8 +113,7 @@ export default async function AdminDashboardPage() {
         </div>
 
         <p className="font-mono text-[0.65rem] uppercase tracking-[0.08em] text-muted">
-          {admin.displayName || admin.email} ·{" "}
-          {admin.role === "super_admin" ? "Super admin" : "Staff"}
+          {admin.displayName || admin.email} · {rolesLabel(admin.roles)}
         </p>
       </header>
 
@@ -256,7 +256,7 @@ export default async function AdminDashboardPage() {
             >
               Review pending guestlist
             </Link>
-            {admin.role === "super_admin" ? (
+            {hasRole(admin.roles, "super_admin") ? (
               <a
                 href="/api/admin/guestlist/export"
                 download

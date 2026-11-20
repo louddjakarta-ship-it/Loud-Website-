@@ -21,7 +21,7 @@ const sizeClasses: Record<ButtonSize, string> = {
 };
 
 const baseClasses =
-  "inline-flex items-center justify-center gap-2 font-mono text-micro uppercase tracking-[0.12em] transition-colors duration-200 ease-out-expo disabled:cursor-not-allowed disabled:opacity-40";
+  "inline-flex items-center justify-center gap-2 rounded-full font-mono text-micro uppercase tracking-[0.12em] transition-colors duration-200 ease-out-expo disabled:cursor-not-allowed disabled:opacity-40";
 
 export function buttonClassName({
   variant = "accent",

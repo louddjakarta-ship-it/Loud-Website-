@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 
 import { getAdminSession, type AdminSession } from "@/lib/auth/admin";
+import { hasRole } from "@/lib/auth/roles";
 import { PROOF_BUCKET } from "@/lib/storage/constants";
 import { createAdminSupabaseClient } from "@/lib/supabase/admin";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
@@ -77,7 +78,7 @@ export async function deleteGuestlistAction(
 ): Promise<void> {
   const admin = await requireAdminForAction();
 
-  if (admin.role !== "super_admin") {
+  if (!hasRole(admin.roles, "super_admin")) {
     redirect("/admin/unauthorized?reason=role");
   }
 

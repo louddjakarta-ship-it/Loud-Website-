@@ -13,6 +13,7 @@
     "qa:browser": "node scripts/qa-browser.mjs",
     "qa:turnstile": "node --env-file=.env.local scripts/qa-turnstile.mjs",
     "qa:login": "node --env-file=.env.local scripts/qa-login.mjs",
+    "qa:dj": "node --env-file=.env.local scripts/qa-dj.mjs",
     "cleanup:orphans": "node --env-file=.env.local scripts/cleanup-orphans.mjs"
   },
   "dependencies": {

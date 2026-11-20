@@ -9,7 +9,7 @@ import type {
 import { cn } from "@/lib/cn";
 
 const controlClasses =
-  "block w-full border border-line bg-surface px-4 text-base text-paper outline-none transition-colors duration-200 placeholder:text-muted/70 focus:border-accent aria-invalid:border-danger disabled:cursor-not-allowed disabled:opacity-60";
+  "block w-full rounded-xl border border-line bg-surface px-4 text-base text-paper outline-none transition-colors duration-200 placeholder:text-muted/70 focus:border-accent aria-invalid:border-danger disabled:cursor-not-allowed disabled:opacity-60";
 
 export function Label({
   className,

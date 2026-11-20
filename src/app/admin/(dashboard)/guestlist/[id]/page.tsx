@@ -11,6 +11,7 @@ import { ConfirmForm } from "@/components/admin/confirm-form";
 import { Button } from "@/components/ui/button";
 import { Label, Textarea } from "@/components/ui/field";
 import { requireAdmin } from "@/lib/auth/admin";
+import { hasRole } from "@/lib/auth/roles";
 import { formatEventDateTime } from "@/lib/format";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 
@@ -354,7 +355,7 @@ export default async function GuestlistDetailPage({
             </section>
           )}
 
-          {admin.role === "super_admin" ? (
+          {hasRole(admin.roles, "super_admin") ? (
             <section className="border border-danger/30 bg-danger/5 p-5">
               <h2 className="font-display text-2xl uppercase text-danger">
                 Danger zone

@@ -6,3 +6,6 @@ export const FLYER_BUCKET = "event-flyers";
 
 /** Public Supabase Storage bucket for homepage gallery photos. */
 export const GALLERY_BUCKET = "gallery-photos";
+
+/** Public Supabase Storage bucket for DJ presskit portraits. */
+export const DJ_BUCKET = "dj-photos";

@@ -13,6 +13,8 @@
   --color-accent: #c6ff00;
   --color-danger: #ff4d3d;
   --color-success: #7cffb2;
+  --color-bone: #f3f3ec;
+  --color-olive: #4f6b00;
 
   --font-display: var(--font-anton), "Arial Narrow", sans-serif;
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
@@ -48,21 +50,75 @@
   padding-inline: clamp(20px, 5vw, 72px);
 }
 
+@utility shadow-soft {
+  box-shadow: 0 30px 70px -45px rgb(10 10 10 / 0.45);
+}
+
+@utility shadow-float {
+  box-shadow: 0 18px 40px -24px rgb(10 10 10 / 0.35);
+}
+
 @layer components {
   .hero-glow {
     background:
       radial-gradient(
         55% 55% at 18% 22%,
-        rgb(198 255 0 / 0.1),
+        rgb(198 255 0 / 0.14),
         transparent 72%
       ),
       radial-gradient(
         45% 55% at 92% 8%,
-        rgb(198 255 0 / 0.06),
+        rgb(198 255 0 / 0.08),
         transparent 72%
       );
   }
+
+  /*
+   * Public site theme. The showcase uses a dark hero plus light content
+   * sections, so the public pages opt into this palette while the admin
+   * dashboard keeps the original dark tokens.
+   */
+  .site-light {
+    --color-surface: #ffffff;
+    --color-line: #e2e2d6;
+    --color-muted: #6c6c63;
+    --color-paper: #0b0b0a;
+
+    background-color: var(--color-bone);
+    color: #0b0b0a;
+  }
+
+  .theme-dark {
+    --color-ink: #050505;
+    --color-surface: #0b0b0b;
+    --color-line: #1f1f1f;
+    --color-muted: #8a8a8a;
+    --color-paper: #f2f2ed;
+    --color-accent: #c6ff00;
+
+    background-color: #050505;
+    color: #f2f2ed;
+  }
 }
+
+@keyframes marquee-x {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  animation: marquee-x 32s linear infinite;
+}
+
+.animate-marquee-slow {
+  animation: marquee-x 56s linear infinite;
+}
+
 
 @layer base {
   html {

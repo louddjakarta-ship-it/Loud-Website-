@@ -3,7 +3,7 @@
 Daftar hal yang masih memakai placeholder atau harus diisi owner sebelum
 production. Update dokumen ini setiap kali satu item selesai.
 
-Terakhir diperbarui: 19 November 2026.
+Terakhir diperbarui: 20 November 2026.
 
 ---
 
@@ -27,6 +27,9 @@ Terakhir diperbarui: 19 November 2026.
 | 14 | Warna accent final | Placeholder `#C6FF00` | Owner |
 | 15 | Font brand final | Anton + Inter | Owner |
 | 16 | Jadwal cleanup orphan | **Selesai** — Vercel Schedule harian 03:00 WIB | Owner/dev |
+| 17 | Akun DJ (username + password) | Belum ada — dibuat super admin dari `/admin/users` | Owner/dev |
+| 18 | Data presskit DJ (stage name, bio, genre, venue) | Belum ada | Owner |
+| 19 | Foto presskit DJ (potret 4:5) | Belum ada | Owner |
 
 ---
 
@@ -186,8 +189,9 @@ Isi lewat admin dashboard:
 
 ## 3. Checklist sebelum go-live
 
-- [ ] Semua migration di Supabase production sudah dijalankan (10 file).
+- [ ] Semua migration di Supabase production sudah dijalankan (13 file).
 - [ ] Admin production bisa login dengan username + password.
+- [ ] Bucket `dj-photos` ada dan roster `/djs` merespons.
 - [ ] Sign-up publik mati; leaked-password protection aktif.
 - [ ] Domain + HTTPS aktif; `NEXT_PUBLIC_SITE_URL` sudah diperbarui dan
       redeploy.
@@ -216,3 +220,4 @@ Isi lewat admin dashboard:
 | 18 Nov 2026 | Deploy production Vercel `loud-jakarta` → https://loud-jakarta.vercel.app; QA production 245/245 | Dev |
 | 19 Nov 2026 | Cleanup orphan dijadwalkan harian lewat Vercel Schedules + route `CRON_SECRET` | Dev |
 | 19 Nov 2026 | Login username + halaman `/admin/users` (semua admin sama) + ganti password `/admin/account` | Dev |
+| 20 Nov 2026 | Role DJ + multi-role, tabel `djs`, bucket `dj-photos`, roster `/djs`, editor `/dj`, QA DJ 21/21 | Dev |

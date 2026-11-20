@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 
 import { parseGuestlistFilters } from "@/lib/admin/guestlist-filters";
 import { getAdminSession } from "@/lib/auth/admin";
+import { hasRole } from "@/lib/auth/roles";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 
 export const runtime = "nodejs";
@@ -50,7 +51,7 @@ export async function GET(request: Request) {
     return jsonError(401, "unauthorized", "Authentication required.");
   }
 
-  if (admin.role !== "super_admin") {
+  if (!hasRole(admin.roles, "super_admin")) {
     return jsonError(
       403,
       "forbidden",

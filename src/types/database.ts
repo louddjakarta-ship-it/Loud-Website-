@@ -21,6 +21,7 @@ export type Database = {
           id: string;
           is_active: boolean;
           role: Database["public"]["Enums"]["admin_role"];
+          roles: Database["public"]["Enums"]["admin_role"][];
           updated_at: string;
           username: string | null;
         };
@@ -30,6 +31,7 @@ export type Database = {
           id: string;
           is_active?: boolean;
           role?: Database["public"]["Enums"]["admin_role"];
+          roles?: Database["public"]["Enums"]["admin_role"][];
           updated_at?: string;
           username?: string | null;
         };
@@ -39,10 +41,64 @@ export type Database = {
           id?: string;
           is_active?: boolean;
           role?: Database["public"]["Enums"]["admin_role"];
+          roles?: Database["public"]["Enums"]["admin_role"][];
           updated_at?: string;
           username?: string | null;
         };
         Relationships: [];
+      };
+      djs: {
+        Row: {
+          bio: string | null;
+          created_at: string;
+          genres: string[];
+          id: string;
+          instagram_url: string | null;
+          is_published: boolean;
+          photo_path: string | null;
+          profile_id: string;
+          slug: string;
+          stage_name: string;
+          updated_at: string;
+          venues: string[];
+        };
+        Insert: {
+          bio?: string | null;
+          created_at?: string;
+          genres?: string[];
+          id?: string;
+          instagram_url?: string | null;
+          is_published?: boolean;
+          photo_path?: string | null;
+          profile_id: string;
+          slug: string;
+          stage_name: string;
+          updated_at?: string;
+          venues?: string[];
+        };
+        Update: {
+          bio?: string | null;
+          created_at?: string;
+          genres?: string[];
+          id?: string;
+          instagram_url?: string | null;
+          is_published?: boolean;
+          photo_path?: string | null;
+          profile_id?: string;
+          slug?: string;
+          stage_name?: string;
+          updated_at?: string;
+          venues?: string[];
+        };
+        Relationships: [
+          {
+            foreignKeyName: "djs_profile_id_fkey";
+            columns: ["profile_id"];
+            isOneToOne: true;
+            referencedRelation: "admin_profiles";
+            referencedColumns: ["id"];
+          },
+        ];
       };
       events: {
         Row: {
@@ -288,7 +344,7 @@ export type Database = {
       };
     };
     Enums: {
-      admin_role: "super_admin" | "staff";
+      admin_role: "super_admin" | "staff" | "dj";
       guestlist_status: "pending" | "approved" | "rejected";
     };
     CompositeTypes: {
@@ -420,7 +476,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      admin_role: ["super_admin", "staff"],
+      admin_role: ["super_admin", "staff", "dj"],
       guestlist_status: ["pending", "approved", "rejected"],
     },
   },

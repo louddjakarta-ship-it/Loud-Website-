@@ -50,6 +50,9 @@ QA_BASE_URL=http://127.0.0.1:3101 npm run qa:turnstile
 
 # Rate limit login (butuh Playwright + Edge)
 npm run qa:login
+
+# DJ presskit end-to-end (butuh Playwright + Edge)
+npm run qa:dj
 ```
 
 Semua skrip menulis tabel hasil ke `docs/qa-*.md` bila
@@ -59,12 +62,14 @@ Semua skrip menulis tabel hasil ke `docs/qa-*.md` bila
 jadi tidak mengunduh browser Chromium tambahan. Set
 `QA_GUESTLIST_TOKEN=<token>` untuk ikut mengaudit form guestlist privat.
 
-`qa:rls`, `qa:api`, `qa:login`, dan `qa:turnstile` membuat lalu menghapus:
+`qa:rls`, `qa:api`, `qa:login`, `qa:turnstile`, dan `qa:dj` membuat lalu
+menghapus:
 
 - 3 akun Auth QA + `admin_profiles` (staff, super_admin, non-admin);
 - event QA (published/draft/closed/expired);
 - baris guestlist + object proof;
 - baris/object gallery;
+- akun DJ + baris `djs` + foto `dj-photos` (QA DJ);
 - baris `submission_attempts` yang terkait event QA (cascade) atau login QA.
 
 Jangan menjalankan skrip ini di production yang sudah berisi data nyata tanpa
@@ -300,3 +305,34 @@ $CRON_SECRET`.
 Uji dijalankan lokal pada 19 Nov 2026. Pemanggilan nyata (tanpa `?dry=1`)
 belum dijalankan terhadap production karena bucket saat itu kosong; schedule
 pertama akan terlihat di Vercel → **Schedules** setelah deploy.
+
+---
+
+## 11. PHASE 7 — DJ presskit (20 November 2026)
+
+`npm run qa:dj` menguji alur lengkap: super admin membuat akun DJ-only,
+DJ login dan mendarat di `/dj`, menyimpan presskit + foto, presskit tampil di
+`/djs`, `/djs/<slug>`, dan `/#djs`, draft disembunyikan, dan guard role
+diuji dua arah. Skrip membersihkan akun, baris `djs`, dan foto setelah selesai.
+
+| Uji | Hasil |
+|-----|-------|
+| Super admin membuat akun DJ-only dari `/admin/users` | PASS |
+| Akun baru hanya punya role `dj` | PASS |
+| Login DJ-only → `/dj`, bukan `/admin` | PASS |
+| DJ bisa membuka `/dj/account` | PASS |
+| Simpan presskit + upload foto WebP | PASS |
+| Baris `djs` menyimpan foto, genre, venue, Instagram, publish state | PASS |
+| `/djs/<slug>` → `200`, stage name, genre, venue, foto tampil | PASS |
+| `/djs` dan homepage `#djs` menampilkan presskit | PASS |
+| Pengunjung anonim bisa membuka `/djs` dan `/djs/<slug>` | PASS |
+| Unpublish → `/djs/<slug>` `404` | PASS |
+| Admin tanpa role `dj` diblokir dari `/dj` | PASS |
+| Tidak ada error halaman di browser | PASS |
+| `lint` / `typecheck` / `build` | PASS |
+
+Total **24/24 PASS**. QA ini juga menemukan dan memperbaiki dua bug nyata:
+textarea genre/venue menolak CRLF hasil paste dari dokumen Windows, dan
+policy `djs_select` membuat pengunjung anonim gagal membaca roster (policy
+dipisah lewat `20261120100000_djs_anon_select.sql`). Detail ada di
+`docs/PHASE-7-DJ.md`.

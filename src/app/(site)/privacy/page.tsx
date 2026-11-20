@@ -14,9 +14,9 @@ export default function PrivacyPage() {
   return (
     <div className="shell py-[clamp(56px,8vw,120px)]">
       <div className="max-w-3xl">
-        <p className="font-mono text-micro uppercase tracking-[0.12em] text-accent">
+        <span className="inline-flex items-center gap-2 rounded-full border border-line bg-surface px-4 py-2 font-mono text-[0.55rem] uppercase tracking-[0.16em] text-olive">
           Privacy
-        </p>
+        </span>
 
         <h1 className="mt-4 font-display text-display-lg uppercase">
           Privacy

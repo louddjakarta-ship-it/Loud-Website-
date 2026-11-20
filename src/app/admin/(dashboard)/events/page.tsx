@@ -13,6 +13,7 @@ import { ConfirmForm } from "@/components/admin/confirm-form";
 import { CopyGuestlistLink } from "@/components/admin/copy-guestlist-link";
 import { ButtonLink } from "@/components/ui/button";
 import { requireAdmin } from "@/lib/auth/admin";
+import { hasRole } from "@/lib/auth/roles";
 import { getFlyerPublicUrl } from "@/lib/data/events";
 import { formatEventDateTime } from "@/lib/format";
 import { absoluteUrl } from "@/lib/site";
@@ -288,7 +289,7 @@ export default async function AdminEventsPage({
                           </>
                         ) : null}
 
-                        {admin.role === "super_admin" ? (
+                        {hasRole(admin.roles, "super_admin") ? (
                           <>
                             <ConfirmForm
                               action={
